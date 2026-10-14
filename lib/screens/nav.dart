@@ -3,6 +3,7 @@ import 'package:proyecto_entrega1/screens/home.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/screens/activity.dart';
+import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -47,9 +48,7 @@ class _NavPageState extends State<NavPage> {
         ],
       ),
       body: _pages[_currentPageIndex],
-      drawer: Drawer(
-        child: ListView(children: [DrawerHeader(child: Text("sidebar aqui"))]),
-      ),
+      drawer: Sidebar(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentPageIndex,
