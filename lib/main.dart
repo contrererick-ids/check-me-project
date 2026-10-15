@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/screens/nav.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:proyecto_entrega1/screens/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 244, 239, 234),
       ),
-      home: NavPage(),
+      //home: NavPage(),
+      home: LoginScreen(),
+
     );
   }
 }
