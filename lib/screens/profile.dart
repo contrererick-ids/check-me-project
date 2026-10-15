@@ -1,13 +1,11 @@
-
 import 'package:flutter/material.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
 
   void _mostrarMensaje(BuildContext context, String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensaje)));
   }
 
   @override
@@ -31,10 +29,7 @@ class PerfilScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 43,
-          vertical: 20,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 43, vertical: 20),
         children: [
           const SizedBox(height: 20),
 
@@ -88,10 +83,7 @@ class PerfilScreen extends StatelessWidget {
           // Nombre
           const Text(
             'Nombre',
-            style: TextStyle(
-              fontSize: 15,
-              color: Color(0xFF808080),
-            ),
+            style: TextStyle(fontSize: 15, color: Colors.black),
           ),
           const SizedBox(height: 6),
 
@@ -99,7 +91,7 @@ class PerfilScreen extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Nombre',
               hintStyle: const TextStyle(
-                color: Color(0xFFD6D6D6),
+                color: Color.fromARGB(255, 151, 150, 150),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -110,9 +102,7 @@ class PerfilScreen extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
-                borderSide: const BorderSide(
-                  color: Color(0xFFD6D6D6),
-                ),
+                borderSide: const BorderSide(color: Colors.black),
               ),
             ),
           ),
@@ -122,10 +112,7 @@ class PerfilScreen extends StatelessWidget {
           // Celular
           const Text(
             'Celular',
-            style: TextStyle(
-              fontSize: 15,
-              color: Color(0xFF808080),
-            ),
+            style: TextStyle(fontSize: 15, color: Colors.black),
           ),
           const SizedBox(height: 6),
 
@@ -134,7 +121,7 @@ class PerfilScreen extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Celular',
               hintStyle: const TextStyle(
-                color: Color(0xFFD6D6D6),
+                color: Color.fromARGB(255, 151, 150, 150),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -145,9 +132,7 @@ class PerfilScreen extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
-                borderSide: const BorderSide(
-                  color: Color(0xFFD6D6D6),
-                ),
+                borderSide: const BorderSide(color: Colors.black),
               ),
             ),
           ),
@@ -155,23 +140,17 @@ class PerfilScreen extends StatelessWidget {
           const SizedBox(height: 55),
 
           // Cerrar sesion
-          OutlinedButton(
+          ElevatedButton(
             onPressed: () {
-              _mostrarMensaje(
-                context,
-                'Pendiente: cerrar sesión',
-              );
+              _mostrarMensaje(context, 'Pendiente: cerrar sesión');
             },
-            style: OutlinedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
               foregroundColor: Colors.black,
               side: const BorderSide(color: Colors.black),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: const StadiumBorder(),
             ),
-            child: const Text(
-              'Cerrar sesión',
-              style: TextStyle(fontSize: 18),
-            ),
+            child: const Text('Cerrar sesión', style: TextStyle(fontSize: 18)),
           ),
 
           const SizedBox(height: 25),

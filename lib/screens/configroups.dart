@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/models/group.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
@@ -21,17 +20,20 @@ class _ConfigGruposState extends State<ConfigGrupos> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(13, 20, 13, 24),
         children: [
-          // Nombre del viaje
+          // Nombre del grupo
           Text(
             widget.group.name,
             style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF888888),
+              fontSize: 28,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
           ),
 
@@ -41,7 +43,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
           const Text(
             'Miembros:',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
@@ -64,24 +66,18 @@ class _ConfigGruposState extends State<ConfigGrupos> {
           // Contador de miembros
           Text(
             '${amigos.length}/5 miembros',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF888888),
-            ),
+            style: const TextStyle(fontSize: 15, color: Color(0xFF888888)),
           ),
-
 
           const SizedBox(height: 24),
 
           // Boton para agregar miembros
           Center(
-            child: OutlinedButton.icon(
+            child: ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                      'Pendiente: agregar miembros al grupo',
-                    ),
+                    content: Text('Pendiente: agregar miembros al grupo'),
                   ),
                 );
               },
@@ -95,14 +91,11 @@ class _ConfigGruposState extends State<ConfigGrupos> {
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 18,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                  color: Colors.black,
-                  width: 2,
-                ),
+                side: const BorderSide(color: Colors.black, width: 2),
                 shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 17,
@@ -121,7 +114,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
             child: Text(
               'Mis amigos:',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -133,11 +126,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
           // Lista de amigos
           ...amigos.map((amigo) {
             return Padding(
-              padding: const EdgeInsets.only(
-                left: 30,
-                right: 27,
-                bottom: 26,
-              ),
+              padding: const EdgeInsets.only(left: 30, right: 27, bottom: 26),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -149,7 +138,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
                         Text(
                           amigo['nombre']!,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -194,7 +183,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
                     child: const Text(
                       'Eliminar',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: FontWeight.normal,
                       ),
                     ),
