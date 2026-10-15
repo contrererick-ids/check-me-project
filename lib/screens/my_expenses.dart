@@ -30,7 +30,13 @@ class ExpensesPage extends StatelessWidget {
     final List<String> tripIds = groupedExpenses.keys.toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Mis Gastos")),
+      appBar: AppBar(
+        title: const Text(
+          "Mis Gastos",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: ListView.builder(
         itemCount: tripIds.length,
         itemBuilder: (context, index) {
@@ -45,7 +51,11 @@ class ExpensesPage extends StatelessWidget {
                 padding: const EdgeInsets.all(15),
                 child: Text(
                   trip?.title ?? "N/A",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withValues(alpha: 0.6),
+                  ),
                 ),
               ),
               ...tripExpenses.map((expense) => ExpenseItem(expense: expense)),
