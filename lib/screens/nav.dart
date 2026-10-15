@@ -4,6 +4,7 @@ import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/screens/activity.dart';
 import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart';
+import 'package:proyecto_entrega1/screens/settings.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -21,7 +22,7 @@ class _NavPageState extends State<NavPage> {
     Homepage(trip: _activeTrip),
     Homepage(trip: _activeTrip),
     ActivityPage(),
-    Homepage(trip: _activeTrip),
+    Settings(),
   ];
 
   void _selectPage(int index) {
