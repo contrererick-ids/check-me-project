@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_entrega1/screens/home.dart';
-import 'package:proyecto_entrega1/data/dummy_data.dart';
-import 'package:proyecto_entrega1/models/trip.dart';
-import 'package:proyecto_entrega1/screens/activity.dart';
 import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart';
-<<<<<<< HEAD
+import 'package:proyecto_entrega1/screens/home.dart';
+import 'package:proyecto_entrega1/screens/my_expenses.dart';
+import 'package:proyecto_entrega1/screens/groups.dart';
 import 'package:proyecto_entrega1/screens/settings.dart';
-=======
 import 'package:proyecto_entrega1/screens/profile.dart';
->>>>>>> main
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -18,16 +14,14 @@ class NavPage extends StatefulWidget {
 }
 
 class _NavPageState extends State<NavPage> {
-  final Trip _activeTrip = trips.firstWhere((trip) => trip.status == "active");
 
   int _currentPageIndex = 0;
 
   late final List<Widget> _pages = [
-    Homepage(trip: _activeTrip),
-    Homepage(trip: _activeTrip),
-
-    ActivityPage(),
-    Settings(),
+    HomePage(),
+    GroupsScreen(),
+    ExpensesPage(),
+    SettingsPage(),
   ];
 
   void _selectPage(int index) {
@@ -72,7 +66,7 @@ class _NavPageState extends State<NavPage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.groups), label: 'Grupos'),
-          BottomNavigationBarItem(icon: Icon(Icons.moving), label: 'Actividad'),
+          BottomNavigationBarItem(icon: Icon(Icons.moving), label: 'Mis Gastos'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
         ],
       ),

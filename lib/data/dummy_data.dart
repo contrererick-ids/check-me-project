@@ -1,5 +1,6 @@
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
+import 'package:proyecto_entrega1/models/group.dart';
 
 var trips = [
   Trip(
@@ -142,4 +143,19 @@ final List<Map<String, String>> amigosGrupoDummy = [
     'nombre': 'Luis',
     'celular': '+52 33 55 88 11 74',
   },
+];
+
+var groups = [
+  Group(
+    id: "group1",
+    name: "Amigos de la universidad",
+    memberNames: ["Jazmin", "José", "Raúl", "Milena", "Luis"],
+    tripIds: ["trip1", "trip2"],
+  ),
+  Group(
+    id: "group2",
+    name: "Compañeros de trabajo",
+    memberNames: ["Jazmin", "Luis"],
+    tripIds: [],
+  ),
 ];

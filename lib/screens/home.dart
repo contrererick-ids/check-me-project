@@ -1,163 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_entrega1/models/trip.dart';
-import 'package:proyecto_entrega1/models/expense.dart';
-import 'package:proyecto_entrega1/data/dummy_data.dart';
-import 'package:proyecto_entrega1/widgets/expense_item.dart';
 import 'package:intl/intl.dart';
+import 'package:proyecto_entrega1/models/trip.dart';
+import 'package:proyecto_entrega1/data/dummy_data.dart';
+import 'package:proyecto_entrega1/screens/activity_details.dart';
+import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart'; // ajusta la ruta
 
-class Homepage extends StatelessWidget {
-  Homepage({super.key, required this.trip});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-  final Trip trip;
-  late final tripExpenses = expenses.where(
-    (expense) => expense.tripId == trip.id,
-  );
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Future<void> _createActivity() async {
+    final controller = TextEditingController();
+
+    final title = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Nueva actividad"),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: "Nombre de la actividad"),
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text("Crear"),
+          ),
+        ],
+      ),
+    );
+
+    if (title == null || title.isEmpty) return;
+
+    setState(() {
+      // Ajusta los parámetros al constructor real de Trip
+      trips.add(
+        Trip(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: title,
+          userIds: [],
+          startDate: DateTime.now(),
+          endDate: DateTime.now(),
+          currency: '',
+          status: '',
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("Actividades")),
       body: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      trip.title,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  trip.userIds.length.toString() +
-                      " personas • "
-                          "Activo desde " +
-                      DateFormat("MMMM d", "es").format(trip.startDate),
-                  style: TextStyle(color: Colors.black.withValues(alpha: 0.4)),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: Container(
-                padding: EdgeInsets.all(20),
-                height: 210,
-                width: 450,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: BoxBorder.all(
-                    color: const Color.fromARGB(255, 219, 215, 211),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "GASTO TOTAL DEL GRUPO",
-                      style: TextStyle(fontSize: 13),
-                    ),
-                    Text(
-                      "\$5000 MXN",
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Divider(color: Colors.grey, thickness: 0.5, height: 20),
-                    Text("TU APORTE", style: TextStyle(fontSize: 13)),
-                    Text(
-                      "\$750 MXN",
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             Expanded(
-              child: ExpenseCollapsible(expenses: tripExpenses.toList()),
+              child: trips.isEmpty
+                  ? const Center(child: Text("Aún no tienes actividades"))
+                  : ListView.builder(
+                      itemCount: trips.length,
+                      itemBuilder: (context, index) {
+                        final trip = trips[index];
+                        return Card(
+                          color: Colors.white,
+                          elevation: 0,
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: const BorderSide(
+                              color: Color.fromARGB(255, 219, 215, 211),
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            title: Text(
+                              trip.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              "${trip.userIds.length} personas • "
+                              "Activo desde ${DateFormat("MMMM d", "es").format(trip.startDate)}",
+                            ),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ActivityDetails(trip: trip),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
-            ElevatedButton(
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Pendiente: lleva a pagina de añadir cargos'),
-                ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _createActivity,
+                child: const Text("Crear Actividad"),
               ),
-              child: Text("Añadir Cargo"),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class ExpenseCollapsible extends StatefulWidget {
-  const ExpenseCollapsible({super.key, required this.expenses});
-
-  final List<Expense> expenses;
-
-  @override
-  State<ExpenseCollapsible> createState() => __ExpenseCollapsibleState();
-}
-
-class __ExpenseCollapsibleState extends State<ExpenseCollapsible> {
-  bool _showAll = false;
-  final int _itemLimit = 3;
-
-  @override
-  Widget build(BuildContext context) {
-    final totalItems = widget.expenses.length;
-    final visibleItems = _showAll
-        ? totalItems
-        : totalItems.clamp(0, _itemLimit);
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "Gastos Recientes",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            if (totalItems > _itemLimit)
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _showAll = !_showAll;
-                  });
-                },
-                child: Text(
-                  _showAll ? "Ver menos" : "Ver todo",
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 237, 108, 69),
-                  ),
-                ),
-              ),
-          ],
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: visibleItems,
-            itemBuilder: (context, index) =>
-                ExpenseItem(expense: widget.expenses[index]),
-          ),
-        ),
-      ],
     );
   }
 }
