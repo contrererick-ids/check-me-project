@@ -4,6 +4,7 @@ import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/screens/activity.dart';
 import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart';
+import 'package:proyecto_entrega1/screens/profile.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -20,6 +21,7 @@ class _NavPageState extends State<NavPage> {
   late final List<Widget> _pages = [
     Homepage(trip: _activeTrip),
     Homepage(trip: _activeTrip),
+
     ActivityPage(),
     Homepage(trip: _activeTrip),
   ];
@@ -37,11 +39,21 @@ class _NavPageState extends State<NavPage> {
         backgroundColor: Color.fromARGB(255, 244, 239, 234),
         actions: [
           Padding(
-            padding: EdgeInsets.all(5),
-            child: CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(
-                "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
+            padding: const EdgeInsets.all(5),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PerfilScreen(),
+                  ),
+                );
+              },
+              child: const CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(
+                  "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
+                ),
               ),
             ),
           ),
