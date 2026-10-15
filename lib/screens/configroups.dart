@@ -1,9 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:proyecto_entrega1/models/group.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 
 class ConfigGrupos extends StatefulWidget {
-  const ConfigGrupos({super.key});
+  const ConfigGrupos({super.key, required this.group});
+
+  final Group group;
 
   @override
   State<ConfigGrupos> createState() => _ConfigGruposState();
@@ -19,12 +22,13 @@ class _ConfigGruposState extends State<ConfigGrupos> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(13, 20, 13, 24),
         children: [
           // Nombre del viaje
-          const Text(
-            'Viaje a Puerto Vallarta',
+          Text(
+            widget.group.name,
             style: TextStyle(
               fontSize: 14,
               color: Color(0xFF888888),

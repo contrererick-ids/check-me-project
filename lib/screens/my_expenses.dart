@@ -4,8 +4,8 @@ import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/widgets/expense_item.dart';
 
-class ActivityPage extends StatelessWidget {
-  const ActivityPage({super.key});
+class ExpensesPage extends StatelessWidget {
+  const ExpensesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +30,7 @@ class ActivityPage extends StatelessWidget {
     final List<String> tripIds = groupedExpenses.keys.toList();
 
     return Scaffold(
+      appBar: AppBar(title: const Text("Mis Gastos")),
       body: ListView.builder(
         itemCount: tripIds.length,
         itemBuilder: (context, index) {

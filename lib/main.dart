@@ -18,9 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 244, 239, 234),
       ),
-      //home: NavPage(),
       home: LoginScreen(),
-
+      /*home: NavPage(),*/
     );
   }
 }
