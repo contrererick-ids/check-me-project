@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/screens/activity_details.dart';
-import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart'; // ajusta la ruta
+import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart'; 
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,7 +42,6 @@ class _HomePageState extends State<HomePage> {
     if (title == null || title.isEmpty) return;
 
     setState(() {
-      // Ajusta los parámetros al constructor real de Trip
       trips.add(
         Trip(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
