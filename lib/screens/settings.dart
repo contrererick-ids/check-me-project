@@ -53,8 +53,16 @@ class SettingsPage extends StatelessWidget {
                     ),
                     subtitle: Text('email@dummy.com'),
                     trailing: IconButton(
-                      onPressed: () => (),
-                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Pendiente función editar correo',
+                            ),
+                          ),
+                        );
+                      },
+                    icon: Icon(Icons.edit),
                     ),
                   ),
                   ListTile(
@@ -64,7 +72,15 @@ class SettingsPage extends StatelessWidget {
                     ),
                     subtitle: Text('***********'),
                     trailing: IconButton(
-                      onPressed: () => (),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Pendiente función editar contraseña',
+                            ),
+                          ),
+                        );
+                      },
                       icon: Icon(Icons.edit),
                     ),
                   ),
@@ -100,7 +116,15 @@ class SettingsPage extends StatelessWidget {
                   ListTile(
                     title: Text('Modo Oscuro'),
                     trailing: IconButton(
-                      onPressed: () => (),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Pendiente función cambiar entre modo oscuro y modo claro',
+                            ),
+                          ),
+                        );
+                      },
                       icon: Icon(Icons.dark_mode),
                     ),
                   ),
