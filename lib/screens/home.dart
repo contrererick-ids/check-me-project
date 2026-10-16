@@ -119,11 +119,7 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _createActivity,
-<<<<<<< HEAD
                 style: ElevatedButton.styleFrom(
-=======
-                style: OutlinedButton.styleFrom(
->>>>>>> 26ef33d3ee7a84cb5473b99516402fa8c8aa7019
                   foregroundColor: Colors.black,
                   side: const BorderSide(color: Colors.black),
                   padding: const EdgeInsets.symmetric(vertical: 15),
