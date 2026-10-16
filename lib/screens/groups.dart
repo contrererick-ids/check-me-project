@@ -212,7 +212,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => _showGroupDialog(),
-                style: OutlinedButton.styleFrom(
+                style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.black,
                   side: const BorderSide(color: Colors.black),
                   padding: const EdgeInsets.symmetric(vertical: 15),

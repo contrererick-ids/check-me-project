@@ -17,7 +17,9 @@ class ActivityDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(), // da el botón de regresar a la lista
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ), // da el botón de regresar a la lista
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -58,16 +60,25 @@ class ActivityDetails extends StatelessWidget {
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("GASTO TOTAL DEL GRUPO", style: TextStyle(fontSize: 13)),
+                    Text(
+                      "GASTO TOTAL DEL GRUPO",
+                      style: TextStyle(fontSize: 13),
+                    ),
                     Text(
                       "\$5000 MXN",
-                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Divider(color: Colors.grey, thickness: 0.5, height: 20),
                     Text("TU APORTE", style: TextStyle(fontSize: 13)),
                     Text(
                       "\$750 MXN",
-                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -76,16 +87,28 @@ class ActivityDetails extends StatelessWidget {
             Expanded(
               child: ExpenseCollapsible(expenses: tripExpenses.toList()),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NuevoCargoScreen(),
-                  ),
-                );
-              },
-              child: const Text("Añadir Cargo"),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NuevoCargoScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Colors.black),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: const StadiumBorder(),
+                ),
+                child: const Text(
+                  "Añadir Cargo",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
             ),
           ],
         ),
@@ -110,7 +133,9 @@ class _ExpenseCollapsibleState extends State<ExpenseCollapsible> {
   @override
   Widget build(BuildContext context) {
     final totalItems = widget.expenses.length;
-    final visibleItems = _showAll ? totalItems : totalItems.clamp(0, _itemLimit);
+    final visibleItems = _showAll
+        ? totalItems
+        : totalItems.clamp(0, _itemLimit);
 
     return Column(
       children: [

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/screens/activity_details.dart';
-import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart'; 
+import 'package:proyecto_entrega1/widgets/sidebar_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _createActivity,
-                style: OutlinedButton.styleFrom(
+                style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.black,
                   side: const BorderSide(color: Colors.black),
                   padding: const EdgeInsets.symmetric(vertical: 15),
