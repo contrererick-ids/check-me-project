@@ -4,6 +4,7 @@ import 'package:proyecto_entrega1/models/expense.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/widgets/expense_item.dart';
 import 'package:intl/intl.dart';
+import 'package:proyecto_entrega1/screens/new_bill.dart';
 
 class ActivityDetails extends StatelessWidget {
   ActivityDetails({super.key, required this.trip});
@@ -76,11 +77,14 @@ class ActivityDetails extends StatelessWidget {
               child: ExpenseCollapsible(expenses: tripExpenses.toList()),
             ),
             ElevatedButton(
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Pendiente: lleva a pagina de añadir cargos'),
-                ),
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NuevoCargoScreen(),
+                  ),
+                );
+              },
               child: const Text("Añadir Cargo"),
             ),
           ],
