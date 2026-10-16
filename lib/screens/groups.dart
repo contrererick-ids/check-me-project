@@ -133,7 +133,13 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Grupos")),
+      appBar: AppBar(
+        title: const Text(
+          "Grupos",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -182,7 +188,10 @@ class _GroupsScreenState extends State<GroupsScreen> {
                                   onPressed: () async {
                                     await Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (_) => ConfigGrupos(group: group)),
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ConfigGrupos(group: group),
+                                      ),
                                     );
                                     setState(() {});
                                   },
@@ -203,6 +212,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => _showGroupDialog(),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Colors.black),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: const StadiumBorder(),
+                ),
                 child: const Text("Crear Grupo"),
               ),
             ),

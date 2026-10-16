@@ -29,17 +29,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   /// Algoritmo simple: el que más debe le paga al que más le deben.
   List<_Transfer> _settle(Map<String, double> balances) {
-    final debtors = balances.entries
-        .where((e) => e.value < -0.005)
-        .map((e) => _Balance(e.key, -e.value))
-        .toList()
-      ..sort((a, b) => b.amount.compareTo(a.amount));
+    final debtors =
+        balances.entries
+            .where((e) => e.value < -0.005)
+            .map((e) => _Balance(e.key, -e.value))
+            .toList()
+          ..sort((a, b) => b.amount.compareTo(a.amount));
 
-    final creditors = balances.entries
-        .where((e) => e.value > 0.005)
-        .map((e) => _Balance(e.key, e.value))
-        .toList()
-      ..sort((a, b) => b.amount.compareTo(a.amount));
+    final creditors =
+        balances.entries
+            .where((e) => e.value > 0.005)
+            .map((e) => _Balance(e.key, e.value))
+            .toList()
+          ..sort((a, b) => b.amount.compareTo(a.amount));
 
     final transfers = <_Transfer>[];
     var d = 0;
@@ -48,8 +50,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     while (d < debtors.length && c < creditors.length) {
       final debtor = debtors[d];
       final creditor = creditors[c];
-      final amount =
-          debtor.amount < creditor.amount ? debtor.amount : creditor.amount;
+      final amount = debtor.amount < creditor.amount
+          ? debtor.amount
+          : creditor.amount;
 
       transfers.add(_Transfer(debtor.name, creditor.name, amount));
       debtor.amount -= amount;
@@ -76,8 +79,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
 
     final tripExpenses = expenses.where((e) => e.tripId == trip.id).toList();
-    final double total =
-        tripExpenses.fold<double>(0, (sum, e) => sum + e.amount);
+    final double total = tripExpenses.fold<double>(
+      0,
+      (sum, e) => sum + e.amount,
+    );
 
     final people = trip.userIds;
     final double share = people.isEmpty ? 0 : total / people.length;
@@ -99,7 +104,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
     String money(double v) => "\$${v.toStringAsFixed(2)} $currency";
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Reportes")),
+      appBar: AppBar(
+        title: const Text("Reportes"),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(15),
         children: [
@@ -133,7 +141,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
                 const Divider(color: Colors.grey, thickness: 0.5, height: 20),
-                Text("${tripExpenses.length} gastos • ${people.length} personas"),
+                Text(
+                  "${tripExpenses.length} gastos • ${people.length} personas",
+                ),
                 const SizedBox(height: 4),
                 Text("Parte por persona: ${money(share)}"),
               ],
@@ -158,13 +168,17 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 side: _border,
               ),
               child: ListTile(
-                title: Text(entry.key),
+                title: Text(
+                  entry.key,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text("Pagó ${money(paid[entry.key] ?? 0)}"),
                 trailing: Text(
                   "${isPositive ? '+' : '-'}${money(balance.abs())}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: isPositive ? Colors.green[700] : Colors.red[700],
+                    fontSize: 18,
                   ),
                 ),
               ),
@@ -191,10 +205,27 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
                 child: ListTile(
                   leading: const Icon(Icons.arrow_forward),
-                  title: Text("${t.from} le paga a ${t.to}"),
+                  title: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: t.from,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(text: ' le paga a '),
+                        TextSpan(
+                          text: t.to,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                   trailing: Text(
                     money(t.amount),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),

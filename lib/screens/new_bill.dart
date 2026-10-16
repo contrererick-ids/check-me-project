@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/data/dummy_data.dart';
 
@@ -10,11 +9,9 @@ class NuevoCargoScreen extends StatefulWidget {
 }
 
 class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
-  final TextEditingController _conceptoController =
-      TextEditingController();
+  final TextEditingController _conceptoController = TextEditingController();
 
-  final TextEditingController _montoController =
-      TextEditingController();
+  final TextEditingController _montoController = TextEditingController();
 
   String? _miembroSeleccionado;
 
@@ -32,9 +29,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
   void _agregarCargo() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Próximamente: función para agregar cargos',
-        ),
+        content: Text('Próximamente: función para agregar cargos'),
       ),
     );
 
@@ -47,21 +42,18 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
       backgroundColor: const Color.fromARGB(255, 244, 239, 234),
 
       // AppBar con el estilo de la aplicacion
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
 
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         children: [
-
-
           // Titulo de la seccion
           const Text(
             'Cargos:',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 25,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
@@ -72,18 +64,13 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
           // Indicador de pestaña
           Stack(
             children: [
-              Container(
-                height: 1,
-                color: const Color(0xFFD6D6D6),
-              ),
+              Container(height: 1, color: const Color(0xFFD6D6D6)),
               Container(
                 width: 100,
                 height: 5,
                 decoration: const BoxDecoration(
                   color: Color(0xFF808080),
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
                 ),
               ),
             ],
@@ -91,11 +78,11 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
 
           const SizedBox(height: 5),
 
-           // Nombre del viaje
+          // Nombre del viaje
           const Text(
             'Viaje a Puerto Vallarta',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               color: Color.fromARGB(255, 72, 72, 72),
             ),
           ),
@@ -107,8 +94,11 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 5),
             padding: const EdgeInsets.fromLTRB(18, 25, 18, 25),
             decoration: BoxDecoration(
-              color: const Color(0xFFD9D9D9),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: const Color.fromARGB(255, 219, 215, 211),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,10 +119,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                 // Concepto
                 const Text(
                   'Concepto:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 8),
@@ -149,10 +136,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                 // Miembro
                 const Text(
                   'Miembro:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 8),
@@ -160,18 +144,13 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                 DropdownButtonFormField<String>(
                   value: _miembroSeleccionado,
                   isExpanded: true,
-                  hint: const Text(
-                    'Selecciona el miembro responsable...',
-                  ),
+                  hint: const Text('Selecciona el miembro responsable...'),
                   items: amigosGrupoDummy.map((amigo) {
                     final nombre = amigo['nombre']!;
 
                     return DropdownMenuItem<String>(
                       value: nombre,
-                      child: Text(
-                        nombre,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      child: Text(nombre, overflow: TextOverflow.ellipsis),
                     );
                   }).toList(),
                   onChanged: (valor) {
@@ -186,18 +165,14 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                 // Monto
                 const Text(
                   'Monto:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 8),
 
                 TextField(
                   controller: _montoController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(
+                  keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
                   decoration: const InputDecoration(
@@ -215,9 +190,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                       onPressed: _cancelar,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
-                        side: const BorderSide(
-                          color: Color(0xFF808080),
-                        ),
+                        side: const BorderSide(color: Color(0xFF808080)),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 22,
                           vertical: 12,
@@ -231,9 +204,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                       onPressed: _agregarCargo,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
-                        side: const BorderSide(
-                          color: Color(0xFF808080),
-                        ),
+                        side: const BorderSide(color: Color(0xFF808080)),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 22,
                           vertical: 12,
