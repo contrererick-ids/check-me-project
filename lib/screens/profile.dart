@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:proyecto_entrega1/screens/login.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
@@ -6,6 +8,53 @@ class PerfilScreen extends StatelessWidget {
   void _mostrarMensaje(BuildContext context, String mensaje) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(mensaje)));
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    // confirmacion antes de cerrar sesion
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cerrar sesion'),
+        content: const Text('¿Seguro que quieres cerrar sesión?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Cerrar sesion',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await FirebaseAuth.instance.signOut();
+
+      if (!context.mounted) return;
+      // quita todas las pantallas anteriores y regresa al login
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      _mostrarMensaje(context, 'No se pudo cerrar sesion. Intenta de nuevo.');
+    }
   }
 
   @override
@@ -141,9 +190,7 @@ class PerfilScreen extends StatelessWidget {
 
           // Cerrar sesion
           ElevatedButton(
-            onPressed: () {
-              _mostrarMensaje(context, 'Pendiente: cerrar sesión');
-            },
+            onPressed: () => _signOut(context),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.black,
               side: const BorderSide(color: Colors.black),
