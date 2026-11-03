@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342704054664",
+    "project_id": "check-me-project",
+    "storage_bucket": "check-me-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342704054664:android:a63c192b710281687ada3d",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_entrega1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4ky_JfopSgzJiJUkbnyitrpRBVSGRVfY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

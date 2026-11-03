@@ -1,37 +1,54 @@
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
 
   Widget _campo({
     required String etiqueta,
     bool password = false,
+    required TextEditingController controller,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           etiqueta,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Color(0xFF808080),
-          ),
+          style: const TextStyle(fontSize: 15, color: Color(0xFF808080)),
         ),
 
         const SizedBox(height: 6),
 
         TextField(
+          controller: controller,
           obscureText: password,
+          enabled: !_loading,
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFFD6D6D6),
-              ),
+              borderSide: const BorderSide(color: Color(0xFFD6D6D6)),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 15,
@@ -41,6 +58,57 @@ class RegisterScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _mostrarMensaje(BuildContext context, String mensaje) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensaje)));
+  }
+
+  Future<void> _createAccount() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirm = _confirmController.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      _mostrarMensaje(context, "Completa todos los campos");
+      return;
+    }
+    if (password.length < 6) {
+      _mostrarMensaje(
+        context,
+        "La contraseña debe tener al menos 6 caracteres",
+      );
+      return;
+    }
+    if (password != confirm) {
+      _mostrarMensaje(context, "Las contraseñas no coinciden");
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      final credentials = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      await credentials.user?.updateDisplayName(username);
+
+      if (!mounted) return;
+      // si firebase ya inicio sesion, volvemos a la raiz
+      Navigator.of(context).popUntil((route) => route.isFirst);
+
+      if(mounted) {
+        _mostrarMensaje(context, "Cuenta creada correctamente");
+      }
+      
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      _mostrarMensaje(context, "Ocurrio un error: $e");
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -66,15 +134,15 @@ class RegisterScreen extends StatelessWidget {
           const SizedBox(height: 15),
 
           // Nombre
-          _campo(
-            etiqueta: 'Nombre',
-          ),
+          _campo(etiqueta: 'Nombre', controller: _usernameController),
 
           const SizedBox(height: 18),
 
           // Correo
           _campo(
             etiqueta: 'Correo',
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
           ),
 
           const SizedBox(height: 18),
@@ -82,6 +150,7 @@ class RegisterScreen extends StatelessWidget {
           // Contraseña
           _campo(
             etiqueta: 'Contraseña',
+            controller: _passwordController,
             password: true,
           ),
 
@@ -90,6 +159,7 @@ class RegisterScreen extends StatelessWidget {
           // Confirmacion de contraseña
           _campo(
             etiqueta: 'Confirmar contraseña',
+            controller: _confirmController,
             password: true,
           ),
 
@@ -100,26 +170,29 @@ class RegisterScreen extends StatelessWidget {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Pendiente: crear cuenta'),
-                  ),
-                );
-              },
+              onPressed: _loading ? null : _createAccount,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF808080),
                 foregroundColor: Colors.white,
                 shape: const StadiumBorder(),
                 elevation: 0,
               ),
-              child: const Text(
-                'Crear cuenta',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
+              child: _loading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Crear cuenta',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
             ),
           ),
         ],
