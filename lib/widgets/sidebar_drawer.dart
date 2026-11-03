@@ -23,13 +23,16 @@ class Sidebar extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           SizedBox(
-            height: 80,
+            height: 200,
             child: DrawerHeader(
               margin: EdgeInsets.zero,
               padding: const EdgeInsets.all(10),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Text("CheckMe!", style: TextStyle(fontSize: 20)),
+              child: Center(
+                child: Image.asset('assets/Logo_CheckMe!.png',
+                width: 300,
+                height: 200,
+                fit: BoxFit.contain,
+                ),
               ),
             ),
           ),

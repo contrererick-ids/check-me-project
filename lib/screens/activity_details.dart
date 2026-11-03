@@ -14,6 +14,17 @@ class ActivityDetails extends StatelessWidget {
     (expense) => expense.tripId == trip.id,
   );
 
+    void _showComingSoon(BuildContext context) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'La función para ver los gastos por persona se agregará próximamente.',
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +95,33 @@ class ActivityDetails extends StatelessWidget {
                 ),
               ),
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 10,
+              ),
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  _showComingSoon(context);
+                },
+                label: const Text(
+                  "Ver gastos por persona",
+                  style: TextStyle(fontSize: 12),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 10,
+                  ),
+                  shape: const StadiumBorder(),
+                ),
+              ),
+            ),
+
             Expanded(
               child: ExpenseCollapsible(expenses: tripExpenses.toList()),
             ),
