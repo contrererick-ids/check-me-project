@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_entrega1/screens/login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
@@ -43,6 +44,7 @@ class PerfilScreen extends StatelessWidget {
 
     try {
       await FirebaseAuth.instance.signOut();
+      await GoogleSignIn.instance.signOut();
 
       if (!context.mounted) return;
       // quita todas las pantallas anteriores y regresa al login
