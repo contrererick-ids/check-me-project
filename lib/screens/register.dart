@@ -98,6 +98,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       // si firebase ya inicio sesion, volvemos a la raiz
       Navigator.of(context).popUntil((route) => route.isFirst);
+
+      if(mounted) {
+        _mostrarMensaje(context, "Cuenta creada correctamente");
+      }
+      
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       _mostrarMensaje(context, "Ocurrio un error: $e");
