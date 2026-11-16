@@ -6,6 +6,7 @@ import 'package:proyecto_entrega1/screens/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:proyecto_entrega1/widgets/forgot_password_dialog.dart';
 
 // svg del logo official de google
 const String _googleLogoSvg = '''
@@ -35,6 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _mostrarMensaje(BuildContext context, String mensaje) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensaje)));
   }
 
   Future<void> _login() async {
@@ -77,10 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loadingGoogle = true);
 
     try {
-      final cuenta = await GoogleSignIn.instance.authenticate();
+      final account = await GoogleSignIn.instance.authenticate();
 
       final credential = GoogleAuthProvider.credential(
-        idToken: cuenta.authentication.idToken,
+        idToken: account.authentication.idToken,
       );
 
       await FirebaseAuth.instance.signInWithCredential(credential);
@@ -104,9 +110,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _mostrarMensaje(BuildContext context, String mensaje) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(mensaje)));
+  Future<void> _recuperarContrasena() async {
+    // precargamos el correo si ya lo escribio en el login
+    final enviadoA = await showDialog<String>(
+      context: context,
+      builder: (_) =>
+          ForgotPasswordDialog(initialEmail: _emailController.text.trim()),
+    );
+
+    if (enviadoA == null || !mounted) return;
+    // mensaje generico: firebase puede no avisar si el correo no existe
+    _mostrarMensaje(
+      context,
+      'Si $enviadoA tiene una cuenta, recibirás un enlace para restablecer tu contraseña. Revisa también spam.',
+    );
   }
 
   @override
@@ -185,9 +202,9 @@ class _LoginScreenState extends State<LoginScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {
-                _mostrarMensaje(context, 'Pendiente: recuperar contraseña');
-              },
+              onPressed: (_loading || _loadingGoogle)
+                  ? null
+                  : _recuperarContrasena,
               child: const Text(
                 '¿Olvidaste tu contraseña?',
                 style: TextStyle(fontSize: 16, color: Colors.black),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_entrega1/data/dummy_data.dart';
+import 'package:proyecto_entrega1/models/expense.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
+import 'package:proyecto_entrega1/services/trips_service.dart';
+import 'package:proyecto_entrega1/utils/firestore_errors.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_entrega1/providers/trips_provider.dart';
 
 class _Balance {
   _Balance(this.name, this.amount);
@@ -24,6 +28,18 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   String? _selectedTripId;
+
+  // el stream de gastos se crea una vez por viaje seleccionado
+  String? _expensesTripId;
+  Stream<List<Expense>>? _expensesStream;
+
+  Stream<List<Expense>> _expensesOf(String tripId) {
+    if (_expensesTripId != tripId || _expensesStream == null) {
+      _expensesTripId = tripId;
+      _expensesStream = TripsService.expensesStream(tripId);
+    }
+    return _expensesStream!;
+  }
 
   static const _border = BorderSide(color: Color.fromARGB(255, 219, 215, 211));
 
@@ -64,13 +80,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return transfers;
   }
 
+  Widget _reportsMessage(String mensaje) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Reportes"),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
+      body: Center(child: Text(mensaje)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (trips.isEmpty) {
+    // llamada provider
+    final tripsProvider = context.watch<TripsProvider>();
+
+    if (tripsProvider.error != null) {
+      return _reportsMessage(firestoreErrorMessage(tripsProvider.error!));
+    }
+    if (tripsProvider.loading) {
       return Scaffold(
         appBar: AppBar(title: const Text("Reportes")),
-        body: const Center(child: Text("Aún no hay viajes para reportar")),
+        body: const Center(child: CircularProgressIndicator()),
       );
+    }
+
+    final trips = tripsProvider.trips;
+    if (trips.isEmpty) {
+      return _reportsMessage("Aún no hay viajes para reportar");
     }
 
     final Trip trip = trips.firstWhere(
@@ -78,19 +115,42 @@ class _ReportsScreenState extends State<ReportsScreen> {
       orElse: () => trips.first,
     );
 
-    final tripExpenses = expenses.where((e) => e.tripId == trip.id).toList();
+    return StreamBuilder<List<Expense>>(
+      stream: _expensesOf(trip.id),
+      builder: (context, expSnap) {
+        if (expSnap.hasError) {
+          return _reportsMessage(firestoreErrorMessage(expSnap.error!));
+        }
+        return _buildReporte(trips, trip, expSnap.data, !expSnap.hasData);
+      },
+    );
+  }
+
+  Widget _buildReporte(
+    List<Trip> trips,
+    Trip trip,
+    List<Expense>? gastos,
+    bool cargando,
+  ) {
+    final tripExpenses = gastos ?? const <Expense>[];
     final double total = tripExpenses.fold<double>(
       0,
       (sum, e) => sum + e.amount,
     );
 
+    // nombres por uid; si alguien pago pero ya no es miembro, usamos el nombre guardado en el gasto
+    final Map<String, String> nombres = {...trip.memberNames};
+    for (final e in tripExpenses) {
+      nombres.putIfAbsent(e.paidById, () => e.paidBy);
+    }
+
     final people = trip.userIds;
     final double share = people.isEmpty ? 0 : total / people.length;
 
-    // Cuánto pagó cada persona
+    // Cuánto pagó cada persona (por uid)
     final Map<String, double> paid = {for (final p in people) p: 0};
     for (final e in tripExpenses) {
-      paid[e.paidBy] = (paid[e.paidBy] ?? 0) + e.amount;
+      paid[e.paidById] = (paid[e.paidById] ?? 0) + e.amount;
     }
 
     // Balance = lo que pagó - lo que le correspondía
@@ -102,6 +162,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final currency = trip.currency;
 
     String money(double v) => "\$${v.toStringAsFixed(2)} $currency";
+    String nombre(String uid) => nombres[uid] ?? 'Miembro';
 
     return Scaffold(
       appBar: AppBar(
@@ -119,6 +180,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 .toList(),
             onChanged: (id) => setState(() => _selectedTripId = id),
           ),
+          if (cargando) const LinearProgressIndicator(),
           const SizedBox(height: 15),
 
           // Resumen general
@@ -169,8 +231,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               child: ListTile(
                 title: Text(
-                  entry.key,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  nombre(entry.key),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text("Pagó ${money(paid[entry.key] ?? 0)}"),
                 trailing: Text(
@@ -209,12 +271,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: t.from,
+                          text: nombre(t.from),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const TextSpan(text: ' le paga a '),
                         TextSpan(
-                          text: t.to,
+                          text: nombre(t.to),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],

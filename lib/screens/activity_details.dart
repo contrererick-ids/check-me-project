@@ -1,29 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
-import 'package:proyecto_entrega1/data/dummy_data.dart';
 import 'package:proyecto_entrega1/widgets/expense_item.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_entrega1/screens/new_bill.dart';
+import 'package:proyecto_entrega1/services/trips_service.dart';
+import 'package:proyecto_entrega1/utils/firestore_errors.dart';
+import 'package:proyecto_entrega1/utils/format.dart';
 
-class ActivityDetails extends StatelessWidget {
-  ActivityDetails({super.key, required this.trip});
+class ActivityDetails extends StatefulWidget {
+  const ActivityDetails({super.key, required this.trip});
 
   final Trip trip;
-  late final tripExpenses = expenses.where(
-    (expense) => expense.tripId == trip.id,
-  );
 
-    void _showComingSoon(BuildContext context) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'La función para ver los gastos por persona se agregará próximamente.',
-          ),
-          duration: Duration(seconds: 3),
+  @override
+  State<ActivityDetails> createState() => _ActivityDetailsState();
+}
+
+class _ActivityDetailsState extends State<ActivityDetails> {
+  Trip get trip => widget.trip;
+
+  // los cargos se actualizan solos en tiempo real desde firestore
+  late final Stream<List<Expense>> _expensesStream =
+      TripsService.expensesStream(widget.trip.id);
+
+  void _showComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'La función para ver los gastos por persona se agregará próximamente.',
         ),
-      );
-    }
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,125 +41,154 @@ class ActivityDetails extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ), // da el botón de regresar a la lista
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+      body: StreamBuilder<List<Expense>>(
+        stream: _expensesStream,
+        builder: (context, snapshot) {
+          final expenses = snapshot.data ?? const <Expense>[];
+          final cargando = !snapshot.hasData && !snapshot.hasError;
+
+          final totalExpense = expenses.fold<double>(
+            0,
+            (suma, e) => suma + e.amount,
+          );
+          final yourShare = expenses
+              .where((e) => e.paidById == TripsService.uid)
+              .fold<double>(0, (suma, e) => suma + e.amount);
+
+          return Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
               children: [
-                Text(
-                  trip.title,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  "${trip.userIds.length} personas • Activo desde ${DateFormat("MMMM d", "es").format(trip.startDate)}",
-                  style: TextStyle(color: Colors.black.withValues(alpha: 0.4)),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                height: 210,
-                width: 450,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 219, 215, 211),
-                  ),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      "GASTO TOTAL DEL GRUPO",
-                      style: TextStyle(fontSize: 13),
-                    ),
-                    Text(
-                      "\$5000 MXN",
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Divider(color: Colors.grey, thickness: 0.5, height: 20),
-                    Text("TU APORTE", style: TextStyle(fontSize: 13)),
-                    Text(
-                      "\$750 MXN",
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        trip.title,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 10,
-              ),
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  _showComingSoon(context);
-                },
-                label: const Text(
-                  "Ver gastos por persona",
-                  style: TextStyle(fontSize: 12),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 10,
-                  ),
-                  shape: const StadiumBorder(),
-                ),
-              ),
-            ),
-
-            Expanded(
-              child: ExpenseCollapsible(expenses: tripExpenses.toList()),
-            ),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NuevoCargoScreen(),
+                Row(
+                  children: [
+                    Text(
+                      "${trip.userIds.length} personas • Activo desde ${DateFormat("MMMM d", "es").format(trip.startDate)}",
+                      style: TextStyle(
+                        color: Colors.black.withValues(alpha: 0.4),
+                      ),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.black),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: const StadiumBorder(),
+                  ],
                 ),
-                child: const Text(
-                  "Añadir Cargo",
-                  style: TextStyle(fontSize: 20),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    height: 210,
+                    width: 450,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color.fromARGB(255, 219, 215, 211),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "GASTO TOTAL DEL GRUPO",
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        Text(
+                          "\$${formatExpense(totalExpense)} ${trip.currency}",
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 0.5,
+                          height: 20,
+                        ),
+                        const Text("TU APORTE", style: TextStyle(fontSize: 13)),
+                        Text(
+                          "\$${formatExpense(yourShare)} ${trip.currency}",
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      _showComingSoon(context);
+                    },
+                    label: const Text(
+                      "Ver gastos por persona",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      shape: const StadiumBorder(),
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: snapshot.hasError
+                      ? Center(
+                          child: Text(firestoreErrorMessage(snapshot.error!)),
+                        )
+                      : cargando
+                      ? const Center(child: CircularProgressIndicator())
+                      : ExpenseCollapsible(expenses: expenses),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // no hace falta refrescar al volver: el stream lo hace solo
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NuevoCargoScreen(trip: trip),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      side: const BorderSide(color: Colors.black),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      "Añadir Cargo",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -197,11 +236,13 @@ class _ExpenseCollapsibleState extends State<ExpenseCollapsible> {
           ],
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: visibleItems,
-            itemBuilder: (context, index) =>
-                ExpenseItem(expense: widget.expenses[index]),
-          ),
+          child: totalItems == 0
+              ? const Center(child: Text("Aún no hay gastos"))
+              : ListView.builder(
+                  itemCount: visibleItems,
+                  itemBuilder: (context, index) =>
+                      ExpenseItem(expense: widget.expenses[index]),
+                ),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
 import 'package:intl/intl.dart';
+import 'package:proyecto_entrega1/utils/format.dart';
 
 class ExpenseItem extends StatelessWidget {
   const ExpenseItem({super.key, required this.expense});
@@ -39,7 +40,7 @@ class ExpenseItem extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.all(10),
                   child: Text(
-                    "\$" + expense.amount.toString(),
+                    "\$" + formatExpense(expense.amount),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ),
