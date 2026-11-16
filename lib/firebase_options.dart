@@ -56,7 +56,6 @@ class DefaultFirebaseOptions {
     projectId: 'check-me-project',
     storageBucket: 'check-me-project.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDWUs-8oTQ9HqX_sD3kYp49Un9gQF8z5Hs',
     appId: '1:342704054664:ios:75cefe04f96be8537ada3d',

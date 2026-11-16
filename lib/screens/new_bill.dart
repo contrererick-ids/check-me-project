@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_entrega1/data/dummy_data.dart';
+import 'package:proyecto_entrega1/models/trip.dart';
+import 'package:proyecto_entrega1/services/trips_service.dart';
+import 'package:proyecto_entrega1/utils/firestore_errors.dart';
+import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
 
 class NuevoCargoScreen extends StatefulWidget {
-  const NuevoCargoScreen({super.key});
+  const NuevoCargoScreen({super.key, required this.trip});
+
+  final Trip trip;
 
   @override
   State<NuevoCargoScreen> createState() => _NuevoCargoScreenState();
@@ -14,6 +19,17 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
   final TextEditingController _montoController = TextEditingController();
 
   String? _miembroSeleccionado;
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // por defecto, el que paga es el usuario actual (si es miembro del viaje)
+    final uid = TripsService.uid;
+    if (uid != null && widget.trip.memberNames.containsKey(uid)) {
+      _miembroSeleccionado = uid;
+    }
+  }
 
   @override
   void dispose() {
@@ -26,14 +42,49 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
     Navigator.pop(context);
   }
 
-  void _agregarCargo() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Próximamente: función para agregar cargos'),
-      ),
+  Future<void> _agregarCargo() async {
+    final concepto = _conceptoController.text.trim();
+    // aceptamos coma o punto como separador decimal
+    final monto = double.tryParse(
+      _montoController.text.trim().replaceAll(',', '.'),
     );
 
-    Navigator.pop(context);
+    if (concepto.isEmpty) {
+      showSnackbarMessage(context, 'Describe el concepto del cargo.');
+      return;
+    }
+    if (_miembroSeleccionado == null) {
+      showSnackbarMessage(context, 'Selecciona el miembro responsable.');
+      return;
+    }
+    if (monto == null || monto <= 0) {
+      showSnackbarMessage(context, 'Ingresa un monto válido mayor a 0.');
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      final sincronizado = await TripsService.addExpense(
+        trip: widget.trip,
+        title: concepto,
+        paidById: _miembroSeleccionado!,
+        amount: monto,
+      );
+
+      if (!mounted) return;
+      showSnackbarMessage(
+        context,
+        sincronizado
+            ? 'Cargo agregado correctamente.'
+            : 'Sin conexión: el cargo se guardará cuando vuelva el internet.',
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      showSnackbarMessage(context, firestoreErrorMessage(e));
+      setState(() => _loading = false);
+    }
   }
 
   @override
@@ -126,6 +177,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
 
                 TextField(
                   controller: _conceptoController,
+                  enabled: !_loading,
                   decoration: const InputDecoration(
                     hintText: 'Describe el cargo que vas a agregar...',
                   ),
@@ -145,19 +197,22 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                   value: _miembroSeleccionado,
                   isExpanded: true,
                   hint: const Text('Selecciona el miembro responsable...'),
-                  items: amigosGrupoDummy.map((amigo) {
-                    final nombre = amigo['nombre']!;
-
+                  items: widget.trip.memberNames.entries.map((miembro) {
                     return DropdownMenuItem<String>(
-                      value: nombre,
-                      child: Text(nombre, overflow: TextOverflow.ellipsis),
+                      value: miembro.key,
+                      child: Text(
+                        miembro.value,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
-                  onChanged: (valor) {
-                    setState(() {
-                      _miembroSeleccionado = valor;
-                    });
-                  },
+                  onChanged: _loading
+                      ? null
+                      : (valor) {
+                          setState(() {
+                            _miembroSeleccionado = valor;
+                          });
+                        },
                 ),
 
                 const SizedBox(height: 20),
@@ -187,7 +242,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     OutlinedButton(
-                      onPressed: _cancelar,
+                      onPressed: _loading ? null : _cancelar,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
                         side: const BorderSide(color: Color(0xFF808080)),
@@ -201,7 +256,7 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                     ),
 
                     OutlinedButton(
-                      onPressed: _agregarCargo,
+                      onPressed: _loading ? null : _agregarCargo,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
                         side: const BorderSide(color: Color(0xFF808080)),
@@ -211,7 +266,13 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                         ),
                         shape: const StadiumBorder(),
                       ),
-                      child: const Text('Agregar'),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Agregar'),
                     ),
                   ],
                 ),
