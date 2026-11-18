@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:proyecto_entrega1/widgets/forgot_password_dialog.dart';
+import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
 
 // svg del logo official de google
 const String _googleLogoSvg = '''
@@ -38,23 +39,18 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _mostrarMensaje(BuildContext context, String mensaje) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(mensaje)));
-  }
-
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (email.isEmpty) {
-      _mostrarMensaje(context, 'Ingresa tu correo.');
+      showSnackbarMessage(context, 'Ingresa tu correo.');
       return;
     } else if (password.isEmpty) {
-      _mostrarMensaje(context, 'Ingresa tu contraseña.');
+      showSnackbarMessage(context, 'Ingresa tu contraseña.');
       return;
     } else if (email.isEmpty && password.isEmpty) {
-      _mostrarMensaje(context, 'Ingresa tu correo y contraseña.');
+      showSnackbarMessage(context, 'Ingresa tu correo y contraseña.');
       return;
     }
 
@@ -73,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      _mostrarMensaje(context, 'Ocurrio un error: $e');
+      showSnackbarMessage(context, 'Ocurrio un error: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -100,29 +96,29 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       // si el usuario cancela, no mostramos error
       if (e.code != GoogleSignInExceptionCode.canceled) {
-        _mostrarMensaje(context, 'No se pudo iniciar sesion con Google.');
+        showSnackbarMessage(context, 'No se pudo iniciar sesion con Google.');
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      _mostrarMensaje(context, 'Ocurrio un error: $e');
+      showSnackbarMessage(context, 'Ocurrio un error: $e');
     } finally {
       if (mounted) setState(() => _loadingGoogle = false);
     }
   }
 
-  Future<void> _recuperarContrasena() async {
+  Future<void> _forgotPassword() async {
     // precargamos el correo si ya lo escribio en el login
-    final enviadoA = await showDialog<String>(
+    final sentTo = await showDialog<String>(
       context: context,
       builder: (_) =>
           ForgotPasswordDialog(initialEmail: _emailController.text.trim()),
     );
 
-    if (enviadoA == null || !mounted) return;
+    if (sentTo == null || !mounted) return;
     // mensaje generico: firebase puede no avisar si el correo no existe
-    _mostrarMensaje(
+    showSnackbarMessage(
       context,
-      'Si $enviadoA tiene una cuenta, recibirás un enlace para restablecer tu contraseña. Revisa también spam.',
+      'Si $sentTo tiene una cuenta, recibirás un enlace para restablecer tu contraseña. Revisa también spam.',
     );
   }
 
@@ -202,9 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: (_loading || _loadingGoogle)
-                  ? null
-                  : _recuperarContrasena,
+              onPressed: (_loading || _loadingGoogle) ? null : _forgotPassword,
               child: const Text(
                 '¿Olvidaste tu contraseña?',
                 style: TextStyle(fontSize: 16, color: Colors.black),

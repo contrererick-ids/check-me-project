@@ -1,10 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:proyecto_entrega1/widgets/account_dialogs.dart';
+import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
 
-class SettingsPage extends StatelessWidget {
+const String _fotoDefault =
+    "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
+
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  User? get _user => FirebaseAuth.instance.currentUser;
+
+  // solo las cuentas con login nativo pueden cambiar correo y contraseña. las de google se administran desde google.
+  bool get _isNativeLogin =>
+      _user?.providerData.any((p) => p.providerId == 'password') ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    // refresca los datos del usuario por si el correo cambio desde otro lado
+    _user
+        ?.reload()
+        .then((_) {
+          if (mounted) setState(() {});
+        })
+        .catchError((_) {});
+  }
+
+  Future<void> _editEmail() async {
+    final newEmail = await showDialog<String>(
+      context: context,
+      builder: (_) => const ChangeEmailDialog(),
+    );
+
+    if (newEmail == null || !mounted) return;
+    showSnackbarMessage(
+      context,
+      'Te enviamos un enlace de verificación a $newEmail. Tu correo cambiará cuando lo confirmes.',
+    );
+  }
+
+  Future<void> _editPassword() async {
+    final updated = await showDialog<bool>(
+      context: context,
+      builder: (_) => const ChangePasswordDialog(),
+    );
+
+    if (updated != true || !mounted) return;
+    showSnackbarMessage(context, 'Contraseña actualizada correctamente.');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final user = _user;
+    final name = (user?.displayName?.trim().isNotEmpty ?? false)
+        ? user!.displayName!
+        : 'Usuario';
+    final email = user?.email ?? 'Sin correo';
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -13,15 +71,15 @@ class SettingsPage extends StatelessWidget {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage(
-                  "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
-                ),
+                backgroundImage: NetworkImage(user?.photoURL ?? _fotoDefault),
               ),
               title: Text(
-                'User 1',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                name,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              subtitle: Text('email@dummy.com', style: TextStyle(fontSize: 20)),
             ),
           ),
           const SizedBox(height: 16),
@@ -51,42 +109,31 @@ class SettingsPage extends StatelessWidget {
                       'Email',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text('email@dummy.com'),
-                    trailing: IconButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Pendiente función editar correo',
-                            ),
-                          ),
-                        );
-                      },
-                    icon: Icon(Icons.edit),
-                    ),
+                    subtitle: Text(email),
+                    trailing: _isNativeLogin
+                        ? IconButton(
+                            onPressed: _editEmail,
+                            icon: Icon(Icons.edit),
+                          )
+                        : null,
                   ),
                   ListTile(
                     title: Text(
                       'Contraseña',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text('***********'),
-                    trailing: IconButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Pendiente función editar contraseña',
-                            ),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.edit),
+                    subtitle: Text(
+                      _isNativeLogin
+                          ? '***********'
+                          : 'Inicio de sesión con Google',
                     ),
+                    trailing: _isNativeLogin
+                        ? IconButton(
+                            onPressed: _editPassword,
+                            icon: Icon(Icons.edit),
+                          )
+                        : null,
                   ),
-                  /* const Text('Name'),
-                  const Text('Email'),
-                  const Text('Password'), */
                 ],
               ),
             ),
