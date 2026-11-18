@@ -5,6 +5,7 @@ import 'package:proyecto_entrega1/screens/my_expenses.dart';
 import 'package:proyecto_entrega1/screens/groups.dart';
 import 'package:proyecto_entrega1/screens/settings.dart';
 import 'package:proyecto_entrega1/screens/profile.dart';
+import 'package:proyecto_entrega1/services/profile_service.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -14,7 +15,6 @@ class NavPage extends StatefulWidget {
 }
 
 class _NavPageState extends State<NavPage> {
-
   int _currentPageIndex = 0;
 
   late final List<Widget> _pages = [
@@ -23,6 +23,13 @@ class _NavPageState extends State<NavPage> {
     ExpensesPage(),
     SettingsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // carga nombre, celular y foto del usuario que acaba de entrar
+    ProfileService.instance.cargar();
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -47,10 +54,11 @@ class _NavPageState extends State<NavPage> {
                   ),
                 );
               },
-              child: const CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(
-                  "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
+              child: ListenableBuilder(
+                listenable: ProfileService.instance,
+                builder: (context, _) => CircleAvatar(
+                  radius: 30,
+                  backgroundImage: ProfileService.instance.foto,
                 ),
               ),
             ),

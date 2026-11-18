@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_entrega1/widgets/account_dialogs.dart';
 import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
+import 'package:proyecto_entrega1/screens/profile.dart';
+import 'package:proyecto_entrega1/services/profile_service.dart';
 
 const String _fotoDefault =
     "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
@@ -58,29 +60,29 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final user = _user;
-    final name = (user?.displayName?.trim().isNotEmpty ?? false)
-        ? user!.displayName!
-        : 'Usuario';
     final email = user?.email ?? 'Sin correo';
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
-          Container(
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(user?.photoURL ?? _fotoDefault),
-              ),
-              title: Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+          ListenableBuilder(
+            listenable: ProfileService.instance,
+            builder: (context, _) {
+              final perfil = ProfileService.instance;
+              return ListTile(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PerfilScreen()),
                 ),
-              ),
-            ),
+                leading: CircleAvatar(radius: 30, backgroundImage: perfil.foto),
+                title: Text(
+                  perfil.nombre,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+              );
+            },
           ),
           const SizedBox(height: 16),
 
