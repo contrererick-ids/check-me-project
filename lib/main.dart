@@ -8,40 +8,53 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:proyecto_entrega1/screens/nav.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_entrega1/providers/trips_provider.dart';
+import 'package:proyecto_entrega1/providers/theme_provider.dart';
+import 'package:proyecto_entrega1/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GoogleSignIn.instance.initialize();
   await initializeDateFormatting('es', null);
-  runApp(const MyApp());
+  await initializeDateFormatting('es', null);
+  final themeProvider = ThemeProvider();
+  await themeProvider.load();
+  runApp(MyApp(themeProvider: themeProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.themeProvider});
+
+  final ThemeProvider themeProvider;
+  static final Stream<User?> _authStream = FirebaseAuth.instance.authStateChanges();
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TripsProvider(),
-      child: MaterialApp(
-        theme: ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(255, 244, 239, 234),
-        ),
-        home: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            // si ya hay sesion iniciada, va directo a NavPage. si no, a LoginScreen
-            if (snapshot.hasData) {
-              return const NavPage();
-            }
-            return const LoginScreen();
-          },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TripsProvider()),
+        ChangeNotifierProvider.value(value: themeProvider),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, theme, _) => MaterialApp(
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: theme.themeMode,
+          home: StreamBuilder<User?>(
+            stream: _authStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              // si ya hay sesion iniciada, va directo a NavPage. si no, a LoginScreen
+              if (snapshot.hasData) {
+                return const NavPage();
+              }
+              return const LoginScreen();
+            },
+          ),
         ),
       ),
     );

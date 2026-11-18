@@ -4,9 +4,9 @@ import 'package:proyecto_entrega1/widgets/account_dialogs.dart';
 import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
 import 'package:proyecto_entrega1/screens/profile.dart';
 import 'package:proyecto_entrega1/services/profile_service.dart';
-
-const String _fotoDefault =
-    "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
+import 'package:provider/provider.dart';
+import 'package:proyecto_entrega1/providers/theme_provider.dart';
+import 'package:proyecto_entrega1/widgets/user_avatar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -59,6 +59,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final themeProvider = context.watch<ThemeProvider>();
     final user = _user;
     final email = user?.email ?? 'Sin correo';
 
@@ -75,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   MaterialPageRoute(builder: (_) => const PerfilScreen()),
                 ),
-                leading: CircleAvatar(radius: 30, backgroundImage: perfil.foto),
+                leading: UserAvatar(radius: 30, image: perfil.foto),
                 title: Text(
                   perfil.nombre,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -91,10 +93,8 @@ class _SettingsPageState extends State<SettingsPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color.fromARGB(255, 219, 215, 211),
-              ),
-              color: Colors.white,
+              border: Border.all(color: cs.outlineVariant),
+              color: cs.surfaceContainer,
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -147,10 +147,8 @@ class _SettingsPageState extends State<SettingsPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: const Color.fromARGB(255, 219, 215, 211),
-              ),
-              color: Colors.white,
+              border: Border.all(color: cs.outlineVariant),
+              color: cs.surfaceContainer,
             ),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -163,18 +161,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   ListTile(
-                    title: Text('Modo Oscuro'),
-                    trailing: IconButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Pendiente función cambiar entre modo oscuro y modo claro',
-                            ),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.dark_mode),
+                    title: const Text('Modo Oscuro'),
+                    trailing: Switch(
+                      value: themeProvider.isDark,
+                      onChanged: (_) => context.read<ThemeProvider>().toggle(),
+                      thumbIcon: WidgetStateProperty.resolveWith(
+                        (states) => Icon(
+                          states.contains(WidgetState.selected)
+                              ? Icons.dark_mode
+                              : Icons.light_mode,
+                        ),
+                      ),
                     ),
                   ),
                 ],

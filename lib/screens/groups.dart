@@ -132,6 +132,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -152,15 +153,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
                       itemBuilder: (context, index) {
                         final group = groups[index];
                         return Card(
-                          color: Colors.white,
+                          color: cs.surfaceContainer,
                           elevation: 0,
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(
-                              color: Color.fromARGB(255, 219, 215, 211),
-                            ),
-                          ),
+                            side: BorderSide(color: cs.outlineVariant),                          ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.only(
                               left: 16,
@@ -213,8 +211,8 @@ class _GroupsScreenState extends State<GroupsScreen> {
               child: ElevatedButton(
                 onPressed: () => _showGroupDialog(),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.black),
+                  foregroundColor: cs.onSurface,
+                  side: BorderSide(color: cs.onSurface),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: const StadiumBorder(),
                 ),

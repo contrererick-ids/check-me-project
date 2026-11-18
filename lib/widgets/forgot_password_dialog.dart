@@ -80,7 +80,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
       actions: [
         TextButton(
           onPressed: _loading ? null : () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
+          child: const Text('Cancelar'),
         ),
         TextButton(
           onPressed: _loading ? null : _send,
@@ -93,7 +93,6 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               : const Text(
                   'Enviar enlace',
                   style: TextStyle(
-                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

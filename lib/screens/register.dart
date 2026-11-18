@@ -30,12 +30,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required TextEditingController controller,
     TextInputType? keyboardType,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           etiqueta,
-          style: const TextStyle(fontSize: 15, color: Color(0xFF808080)),
+          style: TextStyle(fontSize: 15, color: cs.onSurfaceVariant),
         ),
 
         const SizedBox(height: 6),
@@ -48,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFFD6D6D6)),
+              borderSide: BorderSide(color: cs.outlineVariant),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 15,
@@ -113,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -120,14 +122,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         title: const Text(
           'Crear cuenta',
           style: TextStyle(
-            color: Colors.black,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 30),
         children: [
@@ -172,8 +172,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: ElevatedButton(
               onPressed: _loading ? null : _createAccount,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF808080),
-                foregroundColor: Colors.white,
+                backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
                 shape: const StadiumBorder(),
                 elevation: 0,
               ),

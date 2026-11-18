@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_entrega1/screens/login.dart';
 import 'package:proyecto_entrega1/services/profile_service.dart';
 import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
+import 'package:proyecto_entrega1/widgets/user_avatar.dart';
 
 enum _OpcionFoto { camara, galeria, eliminar }
 
@@ -156,7 +157,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: const Text(
               'Cancelar',
-              style: TextStyle(color: Colors.black),
             ),
           ),
           TextButton(
@@ -164,7 +164,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             child: const Text(
               'Cerrar sesion',
               style: TextStyle(
-                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -194,32 +193,33 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   InputDecoration _decoracion(String hint) {
+    final cs = Theme.of(context).colorScheme;
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Color.fromARGB(255, 151, 150, 150)),
+      hintStyle: TextStyle(color: cs.onSurfaceVariant),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(30),
-        borderSide: const BorderSide(color: Colors.black),
+        borderSide: BorderSide(color: cs.outline),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Editar Mi Perfil',
           style: TextStyle(
-            color: Colors.black,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -238,28 +238,25 @@ class _PerfilScreenState extends State<PerfilScreen> {
               children: [
                 ListenableBuilder(
                   listenable: _perfil,
-                  builder: (context, _) => CircleAvatar(
+                    builder: (context, _) => UserAvatar(
                     radius: 87.5,
-                    backgroundColor: const Color(0xFFD9D9D9),
-                    backgroundImage: _perfil.foto,
-                    child: _cambiandoFoto
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : null,
+                    image: _perfil.foto,
+                    loading: _cambiandoFoto,
                   ),
                 ),
                 Positioned(
                   right: 8,
                   bottom: 8,
                   child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: cs.surface, 
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       onPressed: _elegirFoto,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.camera_alt,
-                        color: Colors.black,
+                        color: cs.onSurface,
                         size: 25,
                       ),
                     ),
@@ -274,7 +271,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           // Nombre
           const Text(
             'Nombre',
-            style: TextStyle(fontSize: 15, color: Colors.black),
+            style: TextStyle(fontSize: 15),
           ),
           const SizedBox(height: 6),
           TextField(
@@ -289,7 +286,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           // Celular
           const Text(
             'Celular',
-            style: TextStyle(fontSize: 15, color: Colors.black),
+            style: TextStyle(fontSize: 15),
           ),
           const SizedBox(height: 6),
           TextField(
@@ -311,8 +308,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
             child: ElevatedButton(
               onPressed: (_guardando || _cambiandoFoto) ? null : _guardar,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF808080),
-                foregroundColor: Colors.white,
+                backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
                 shape: const StadiumBorder(),
                 elevation: 0,
               ),
@@ -338,8 +335,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ElevatedButton(
             onPressed: _guardando ? null : () => _signOut(context),
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black,
-              side: const BorderSide(color: Colors.black),
+              foregroundColor: cs.onSurface,
+              side: BorderSide(color: cs.onSurface),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: const StadiumBorder(),
             ),

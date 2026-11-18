@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -99,14 +100,12 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       final trip = trips[index];
                       return Card(
-                        color: Colors.white,
+                        color: cs.surfaceContainer, 
                         elevation: 0,
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(
-                            color: Color.fromARGB(255, 219, 215, 211),
-                          ),
+                          side: BorderSide(color: cs.outlineVariant),
                         ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(
@@ -143,8 +142,8 @@ class _HomePageState extends State<HomePage> {
               child: ElevatedButton(
                 onPressed: _createActivity,
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.black),
+                  foregroundColor: cs.onSurface,
+                  side: BorderSide(color: cs.onSurface),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: const StadiumBorder(),
                 ),

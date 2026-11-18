@@ -112,7 +112,7 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
       actions: [
         TextButton(
           onPressed: _loading ? null : () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
+          child: const Text('Cancelar'),
         ),
         TextButton(
           onPressed: _loading ? null : _guardar,
@@ -121,7 +121,6 @@ class _ChangeEmailDialogState extends State<ChangeEmailDialog> {
               : const Text(
                   'Guardar',
                   style: TextStyle(
-                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -246,7 +245,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
       actions: [
         TextButton(
           onPressed: _loading ? null : () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.black)),
+          child: const Text('Cancelar'),
         ),
         TextButton(
           onPressed: _loading ? null : _save,
@@ -255,7 +254,6 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
               : const Text(
                   'Guardar',
                   style: TextStyle(
-                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

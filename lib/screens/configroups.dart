@@ -19,6 +19,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -32,7 +33,6 @@ class _ConfigGruposState extends State<ConfigGrupos> {
             widget.group.name,
             style: TextStyle(
               fontSize: 28,
-              color: Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -45,7 +45,6 @@ class _ConfigGruposState extends State<ConfigGrupos> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
             ),
           ),
 
@@ -56,7 +55,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
             width: 90,
             height: 7,
             decoration: BoxDecoration(
-              color: const Color(0xFF888888),
+              color: cs.outlineVariant,
               borderRadius: BorderRadius.circular(6),
             ),
           ),
@@ -66,7 +65,7 @@ class _ConfigGruposState extends State<ConfigGrupos> {
           // Contador de miembros
           Text(
             '${amigos.length}/5 miembros',
-            style: const TextStyle(fontSize: 15, color: Color(0xFF888888)),
+            style: TextStyle(fontSize: 15, color: cs.onSurfaceVariant),
           ),
 
           const SizedBox(height: 24),
@@ -84,18 +83,17 @@ class _ConfigGruposState extends State<ConfigGrupos> {
               icon: const Icon(
                 Icons.person_add_alt_1,
                 size: 18,
-                color: Colors.black,
               ),
               label: const Text(
                 'Agregar miembros',
                 style: TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.black, width: 2),
+                foregroundColor: cs.onSurface,
+                side: BorderSide(color: cs.onSurface, width: 2),
                 shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 17,
@@ -169,11 +167,8 @@ class _ConfigGruposState extends State<ConfigGrupos> {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Color(0xFF888888),
-                        width: 1,
-                      ),
-                      foregroundColor: Colors.black,
+                      foregroundColor: cs.onSurface,
+                      side: BorderSide(color: cs.outline, width: 1),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 3,

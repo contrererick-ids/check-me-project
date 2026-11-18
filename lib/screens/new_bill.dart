@@ -89,8 +89,8 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 244, 239, 234),
 
       // AppBar con el estilo de la aplicacion
       appBar: AppBar(
@@ -106,7 +106,6 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
             style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
             ),
           ),
 
@@ -115,12 +114,12 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
           // Indicador de pestaña
           Stack(
             children: [
-              Container(height: 1, color: const Color(0xFFD6D6D6)),
+              Container(height: 1, color: cs.outlineVariant),
               Container(
                 width: 100,
                 height: 5,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF808080),
+                decoration: BoxDecoration(
+                  color: cs.outline,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
                 ),
               ),
@@ -130,11 +129,11 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
           const SizedBox(height: 5),
 
           // Nombre del viaje
-          const Text(
+          Text(
             'Viaje a Puerto Vallarta',
             style: TextStyle(
               fontSize: 16,
-              color: Color.fromARGB(255, 72, 72, 72),
+              color: cs.onSurfaceVariant,
             ),
           ),
 
@@ -145,11 +144,9 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 5),
             padding: const EdgeInsets.fromLTRB(18, 25, 18, 25),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surfaceContainer,
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: const Color.fromARGB(255, 219, 215, 211),
-              ),
+              border: Border.all(color: cs.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +157,6 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -244,8 +240,8 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                     OutlinedButton(
                       onPressed: _loading ? null : _cancelar,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFF808080)),
+                        foregroundColor: cs.onSurface,
+                        side: BorderSide(color: cs.outline),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 22,
                           vertical: 12,
@@ -258,8 +254,8 @@ class _NuevoCargoScreenState extends State<NuevoCargoScreen> {
                     OutlinedButton(
                       onPressed: _loading ? null : _agregarCargo,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFF808080)),
+                        foregroundColor: cs.onSurface,
+                        side: BorderSide(color: cs.outline),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 22,
                           vertical: 12,

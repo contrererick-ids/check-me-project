@@ -37,6 +37,7 @@ class _ActivityDetailsState extends State<ActivityDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -78,7 +79,7 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                     Text(
                       "${trip.userIds.length} personas • Activo desde ${DateFormat("MMMM d", "es").format(trip.startDate)}",
                       style: TextStyle(
-                        color: Colors.black.withValues(alpha: 0.4),
+                        color: cs.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -86,15 +87,14 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                 Padding(
                   padding: const EdgeInsets.all(15),
                   child: Container(
+                    color: cs.surfaceContainer,
                     padding: const EdgeInsets.all(20),
                     height: 210,
                     width: 450,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color.fromARGB(255, 219, 215, 211),
-                      ),
+                      border: Border.all(color: cs.outlineVariant),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,8 +110,8 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Divider(
-                          color: Colors.grey,
+                        Divider(
+                          color: cs.outlineVariant,
                           thickness: 0.5,
                           height: 20,
                         ),
@@ -174,8 +174,8 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      side: const BorderSide(color: Colors.black),
+                      foregroundColor: cs.onSurface,
+                      side: BorderSide(color: cs.onSurface),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: const StadiumBorder(),
                     ),
@@ -209,6 +209,7 @@ class _ExpenseCollapsibleState extends State<ExpenseCollapsible> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final totalItems = widget.expenses.length;
     final visibleItems = _showAll
         ? totalItems
@@ -228,9 +229,7 @@ class _ExpenseCollapsibleState extends State<ExpenseCollapsible> {
                 onPressed: () => setState(() => _showAll = !_showAll),
                 child: Text(
                   _showAll ? "Ver menos" : "Ver todo",
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 237, 108, 69),
-                  ),
+                  style: TextStyle(color: cs.primary),
                 ),
               ),
           ],

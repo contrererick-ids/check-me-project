@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_entrega1/utils/format.dart';
+import 'package:proyecto_entrega1/widgets/user_avatar.dart';
 
 class ExpenseItem extends StatelessWidget {
   const ExpenseItem({super.key, required this.expense});
@@ -19,12 +20,7 @@ class ExpenseItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(
-                        "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
-                      ),
-                    ),
+                    leading: const UserAvatar(radius: 30),
                     title: Text(
                       expense.title,
                       style: TextStyle(fontWeight: FontWeight.bold),

@@ -124,8 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Colors.white,
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         children: [
@@ -151,10 +151,10 @@ class _LoginScreenState extends State<LoginScreen> {
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               hintText: 'Correo',
-              hintStyle: const TextStyle(color: Color(0xFFD6D6D6)),
-              suffixIcon: const Icon(
+              hintStyle: TextStyle(color: cs.onSurfaceVariant),
+              suffixIcon: Icon(
                 Icons.mail_outline,
-                color: Color(0xFFD6D6D6),
+                color: cs.onSurfaceVariant,
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
-                borderSide: const BorderSide(color: Color(0xFFD6D6D6)),
+                borderSide: BorderSide(color: cs.outlineVariant),
               ),
             ),
           ),
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: true,
             decoration: InputDecoration(
               hintText: 'Contraseña',
-              hintStyle: const TextStyle(color: Color(0xFFD6D6D6)),
+              hintStyle: TextStyle(color: cs.onSurfaceVariant),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 16,
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
-                borderSide: const BorderSide(color: Color(0xFFD6D6D6)),
+                borderSide: BorderSide(color: cs.outlineVariant),
               ),
             ),
           ),
@@ -201,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: (_loading || _loadingGoogle) ? null : _forgotPassword,
               child: const Text(
                 '¿Olvidaste tu contraseña?',
-                style: TextStyle(fontSize: 16, color: Colors.black),
+                style: TextStyle(fontSize: 16),
               ),
             ),
           ),
@@ -215,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: ElevatedButton(
               onPressed: (_loading || _loadingGoogle) ? null : _login, // esta condicion evita que toquemos el boton de iniciar sesion si ya tocamos el de continuar con google
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF808080),
+                backgroundColor: cs.primary,
                 foregroundColor: Colors.white,
                 shape: const StadiumBorder(),
                 elevation: 0,
@@ -241,14 +241,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
           const SizedBox(height: 25),
 
-          const Row(
+          Row(
             children: [
-              Expanded(child: Divider(color: Color(0xFFD6D6D6))),
+              Expanded(child: Divider(color: cs.outlineVariant)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text('o', style: TextStyle(color: Color(0xFF808080))),
+                child: Text('o', style: TextStyle(color: cs.onSurfaceVariant)),
               ),
-              Expanded(child: Divider(color: Color(0xFFD6D6D6))),
+              Expanded(child: Divider(color: cs.outlineVariant)),
             ],
           ),
 
@@ -261,19 +261,19 @@ class _LoginScreenState extends State<LoginScreen> {
             child: OutlinedButton(
               onPressed: (_loading || _loadingGoogle) ? null : _loginGoogle, // esta condicion evita que toquemos el boton de continuar con google si ya tocamos el de iniciar sesion
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.black,
-                side: const BorderSide(
-                  color: Color.fromARGB(255, 188, 188, 188),
+                foregroundColor: cs.onSurface,
+                side: BorderSide(
+                  color: cs.outline,
                 ),
                 shape: const StadiumBorder(),
               ),
               child: _loadingGoogle
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Color.fromARGB(255, 103, 103, 103),
+                        color: cs.onSurfaceVariant,
                       ),
                     )
                   : Row(
@@ -316,7 +316,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
                   ),
                 ),
               ),

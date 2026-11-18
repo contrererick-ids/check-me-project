@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-const String fotoDefaultUrl =
-    "https://static.vecteezy.com/system/resources/previews/020/765/399/original/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg";
-
 /// Guarda el perfil de la app (nombre y celular en Firestore, foto en local)
 /// y avisa a todas las pantallas cuando algo cambia.
 class ProfileService extends ChangeNotifier {
@@ -42,10 +39,11 @@ class ProfileService extends ChangeNotifier {
   }
 
   /// Foto local > foto de Google > imagen por defecto.
-  ImageProvider get foto {
+  ImageProvider? get foto {
     final local = _fotoLocal;
     if (local != null) return FileImage(local);
-    return NetworkImage(_user?.photoURL ?? fotoDefaultUrl);
+    final url = _user?.photoURL;
+    return url != null ? NetworkImage(url) : null;
   }
 
   Future<File> _archivoFoto(String uid) async {

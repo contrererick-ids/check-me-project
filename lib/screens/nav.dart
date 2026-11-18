@@ -6,6 +6,7 @@ import 'package:proyecto_entrega1/screens/groups.dart';
 import 'package:proyecto_entrega1/screens/settings.dart';
 import 'package:proyecto_entrega1/screens/profile.dart';
 import 'package:proyecto_entrega1/services/profile_service.dart';
+import 'package:proyecto_entrega1/widgets/user_avatar.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -41,7 +42,7 @@ class _NavPageState extends State<NavPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 244, 239, 234),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
           Padding(
             padding: const EdgeInsets.all(5),
@@ -56,9 +57,9 @@ class _NavPageState extends State<NavPage> {
               },
               child: ListenableBuilder(
                 listenable: ProfileService.instance,
-                builder: (context, _) => CircleAvatar(
+                builder: (context, _) => UserAvatar(
                   radius: 30,
-                  backgroundImage: ProfileService.instance.foto,
+                  image: ProfileService.instance.foto,
                 ),
               ),
             ),

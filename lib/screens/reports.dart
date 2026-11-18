@@ -41,7 +41,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return _expensesStream!;
   }
 
-  static const _border = BorderSide(color: Color.fromARGB(255, 219, 215, 211));
+  BorderSide get _border => BorderSide(color: Theme.of(context).colorScheme.outlineVariant);
 
   /// Algoritmo simple: el que más debe le paga al que más le deben.
   List<_Transfer> _settle(Map<String, double> balances) {
@@ -137,6 +137,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
       0,
       (sum, e) => sum + e.amount,
     );
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // nombres por uid; si alguien pago pero ya no es miembro, usamos el nombre guardado en el gasto
     final Map<String, String> nombres = {...trip.memberNames};
@@ -187,7 +189,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surfaceContainer,
               borderRadius: BorderRadius.circular(20),
               border: Border.fromBorderSide(_border),
             ),
@@ -202,7 +204,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Divider(color: Colors.grey, thickness: 0.5, height: 20),
+                Divider(color: cs.outlineVariant, thickness: 0.5, height: 20),
                 Text(
                   "${tripExpenses.length} gastos • ${people.length} personas",
                 ),
@@ -223,7 +225,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
             final balance = entry.value;
             final isPositive = balance >= 0;
             return Card(
-              color: Colors.white,
+              color: isPositive
+                  ? (isDark ? Colors.green[300] : Colors.green[700])
+                  : cs.error,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),

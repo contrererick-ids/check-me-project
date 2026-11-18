@@ -18,7 +18,6 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 244, 239, 234),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -28,10 +27,17 @@ class Sidebar extends StatelessWidget {
               margin: EdgeInsets.zero,
               padding: const EdgeInsets.all(10),
               child: Center(
-                child: Image.asset('assets/Logo_CheckMe!.png',
-                width: 300,
-                height: 200,
-                fit: BoxFit.contain,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // fondo para el logo y que no se pierda en el modo oscuro
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Image.asset(
+                    'assets/Logo_CheckMe!.png',
+                    height: 140,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
