@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Trip {
@@ -10,6 +11,8 @@ class Trip {
     required this.endDate,
     required this.currency,
     required this.status,
+    this.groupId,
+    this.groupName,
   });
 
   final String id;
@@ -21,10 +24,33 @@ class Trip {
   final String currency;
   final String status;
 
+  final String? groupId;
+  final String? groupName;
+
   List<String> get userIds => memberNames.keys.toList();
+
+  Trip copyWith({
+    String? groupId,
+    String? groupName,
+    Map<String, String>? memberNames,
+  }) {
+    return Trip(
+      id: id,
+      title: title,
+      ownerId: ownerId,
+      memberNames: memberNames ?? this.memberNames,
+      startDate: startDate,
+      endDate: endDate,
+      currency: currency,
+      status: status,
+      groupId: groupId ?? this.groupId,
+      groupName: groupName ?? this.groupName,
+    );
+  }
 
   factory Trip.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
+
     final members = Map<String, dynamic>.from(
       (data['members'] as Map<String, dynamic>?) ?? {},
     );
@@ -33,11 +59,17 @@ class Trip {
       id: doc.id,
       title: (data['title'] as String?) ?? '',
       ownerId: (data['ownerId'] as String?) ?? '',
-      memberNames: members.map((uid, nombre) => MapEntry(uid, '$nombre')),
-      startDate: (data['startDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      endDate: (data['endDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      memberNames: members.map(
+        (id, name) => MapEntry(id, '$name'),
+      ),
+      startDate:
+          (data['startDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      endDate:
+          (data['endDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
       currency: (data['currency'] as String?) ?? 'MXN',
       status: (data['status'] as String?) ?? 'active',
+      groupId: data['groupId'] as String?,
+      groupName: data['groupName'] as String?,
     );
   }
 }

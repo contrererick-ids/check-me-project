@@ -1,11 +1,13 @@
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
+import 'package:proyecto_entrega1/models/group.dart';
+import 'package:proyecto_entrega1/models/group_member.dart';
 
-// acceso a Firestore para actividades (trips) y sus cargos (expenses).
 class TripsService {
   TripsService._();
 
@@ -14,40 +16,52 @@ class TripsService {
 
   static String? get uid => _user?.uid;
 
-  // nombre con el que aparece el usuario actual en las actividades
   static String get currentName {
     final name = _user?.displayName?.trim();
-    if (name != null && name.isNotEmpty) return name;
+
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+
     return _user?.email ?? 'Yo';
   }
 
-  static Future<bool> _write(Future<dynamic> operation) async {
+  // Ejecuta operaciones de escritura en Firestore.
+  static Future<bool> _write(
+    Future<dynamic> Function() operation,
+  ) async {
     try {
-      await operation.timeout(const Duration(seconds: 10));
+      await operation().timeout(const Duration(seconds: 10));
       return true;
     } on TimeoutException {
       return false;
     }
   }
 
-  // actividades donde participa el usuario actual, mas recientes primero
+  // Obtener las actividades del usuario actual.
   static Stream<List<Trip>> tripsStream() {
-    final uid = _user?.uid;
-    if (uid == null) return Stream.value(<Trip>[]);
+    final userId = _user?.uid;
+
+    if (userId == null) {
+      return Stream.value(<Trip>[]);
+    }
 
     return _db
         .collection('trips')
-        .where('memberIds', arrayContains: uid)
+        .where('memberIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
-          final trips = snapshot.docs.map(Trip.fromDoc).toList();
-          // se ordena aqui para no requerir un indice compuesto en firestore
-          trips.sort((a, b) => b.startDate.compareTo(a.startDate));
-          return trips;
-        });
+      final trips = snapshot.docs.map(Trip.fromDoc).toList();
+
+      trips.sort(
+        (a, b) => b.startDate.compareTo(a.startDate),
+      );
+
+      return trips;
+    });
   }
 
-  // gastos de una actividad, mas recientes primero
+  // Obtener los gastos de una actividad.
   static Stream<List<Expense>> expensesStream(String tripId) {
     return _db
         .collection('trips')
@@ -56,34 +70,123 @@ class TripsService {
         .orderBy('date', descending: true)
         .snapshots()
         .map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => Expense.fromDoc(tripId, doc)).toList(),
+          (snapshot) => snapshot.docs
+              .map((doc) => Expense.fromDoc(tripId, doc))
+              .toList(),
         );
   }
 
-  // crea la actividad con el usuario actual como dueño y miembro.
+  // Crear una actividad sin asociarla a un grupo.
   static Future<bool> createTrip(String title) {
     final user = _user;
-    if (user == null) throw StateError('No hay sesión iniciada');
 
-    final ahora = Timestamp.now();
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
 
-    return _write(
-      _db.collection('trips').add({
-        'title': title,
+    if (title.trim().isEmpty) {
+      throw ArgumentError(
+        'El nombre de la actividad es obligatorio',
+      );
+    }
+
+    return _write(() async {
+      final now = Timestamp.now();
+
+      await _db.collection('trips').add({
+        'title': title.trim(),
         'ownerId': user.uid,
         'memberIds': [user.uid],
-        'members': {user.uid: currentName},
-        'startDate': ahora,
-        'endDate': ahora,
+        'members': {
+          user.uid: currentName,
+        },
+        'startDate': now,
+        'endDate': now,
         'currency': 'MXN',
         'status': 'active',
         'createdAt': FieldValue.serverTimestamp(),
-      }),
-    );
+      });
+    });
   }
 
-  // agrega gasto
+  // Asociar o cambiar el grupo y los participantes de una actividad.
+  static Future<bool> updateTripGroup({
+    required Trip trip,
+    required Group group,
+    required List<GroupMember> selectedMembers,
+  }) {
+    final user = _user;
+
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
+
+    return _write(() async {
+      final tripRef = _db.collection('trips').doc(trip.id);
+      final newGroupRef = _db.collection('groups').doc(group.id);
+
+      // Verificar que el grupo todavía exista.
+      final newGroupSnapshot = await newGroupRef.get();
+
+      if (!newGroupSnapshot.exists) {
+        throw StateError('El grupo seleccionado ya no existe.');
+      }
+
+      // Construir la lista de participantes de esta actividad.
+      final membersMap = <String, String>{};
+      final memberIds = <String>{user.uid};
+
+      for (final member in selectedMembers) {
+        membersMap[member.id] = member.name;
+
+        // Los integrantes registrados tienen userId.
+        // Los contactos telefónicos se guardan en members,
+        // pero no se agregan a memberIds.
+        if (member.userId != null) {
+          memberIds.add(member.userId!);
+        }
+      }
+
+      // El creador siempre forma parte de la actividad.
+      membersMap.putIfAbsent(
+        user.uid,
+        () => currentName,
+      );
+
+      final batch = _db.batch();
+
+      // Actualizar la actividad.
+      batch.update(tripRef, {
+        'groupId': group.id,
+        'groupName': group.name,
+        'members': membersMap,
+        'memberIds': memberIds.toList(),
+      });
+
+      // Si se cambió de grupo, quitar la actividad del anterior.
+      if (trip.groupId != null && trip.groupId != group.id) {
+        final oldGroupRef =
+            _db.collection('groups').doc(trip.groupId);
+
+        final oldGroupSnapshot = await oldGroupRef.get();
+
+        if (oldGroupSnapshot.exists) {
+          batch.update(oldGroupRef, {
+            'tripIds': FieldValue.arrayRemove([trip.id]),
+          });
+        }
+      }
+
+      // Asociar la actividad al grupo nuevo.
+      batch.update(newGroupRef, {
+        'tripIds': FieldValue.arrayUnion([trip.id]),
+      });
+
+      await batch.commit();
+    });
+  }
+
+  // Agregar un gasto a una actividad.
   static Future<bool> addExpense({
     required Trip trip,
     required String title,
@@ -91,14 +194,21 @@ class TripsService {
     required double amount,
   }) {
     final user = _user;
-    if (user == null) throw StateError('No hay sesión iniciada');
+
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
 
     return _write(
-      _db.collection('trips').doc(trip.id).collection('expenses').add({
+      () => _db
+          .collection('trips')
+          .doc(trip.id)
+          .collection('expenses')
+          .add({
         'title': title,
         'paidById': paidById,
         'paidBy': trip.memberNames[paidById] ?? 'Miembro',
-        'amount': (amount * 100).round() / 100, // redondeado a centavos
+        'amount': (amount * 100).round() / 100,
         'date': Timestamp.now(),
         'createdBy': user.uid,
       }),
