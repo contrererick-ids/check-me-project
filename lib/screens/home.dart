@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_entrega1/screens/activity_details.dart';
@@ -25,7 +26,9 @@ class _HomePageState extends State<HomePage> {
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(hintText: "Nombre de la actividad"),
+          decoration: const InputDecoration(
+            hintText: "Nombre de la actividad",
+          ),
           textCapitalization: TextCapitalization.sentences,
         ),
         actions: [
@@ -34,18 +37,25 @@ class _HomePageState extends State<HomePage> {
             child: const Text("Cancelar"),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            onPressed: () => Navigator.pop(
+              context,
+              controller.text.trim(),
+            ),
             child: const Text("Crear"),
           ),
         ],
       ),
     );
 
+    controller.dispose();
+
     if (title == null || title.isEmpty) return;
 
     try {
       final synced = await TripsService.createTrip(title);
+
       if (!mounted) return;
+
       if (!synced) {
         showSnackbarMessage(
           context,
@@ -61,6 +71,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -76,19 +87,24 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Builder(
                 builder: (context) {
-                  // llamada provider
                   final tripsProvider = context.watch<TripsProvider>();
 
                   if (tripsProvider.error != null) {
                     return Center(
-                      child: Text(firestoreErrorMessage(tripsProvider.error!)),
+                      child: Text(
+                        firestoreErrorMessage(tripsProvider.error!),
+                      ),
                     );
                   }
+
                   if (tripsProvider.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
 
                   final trips = tripsProvider.trips;
+
                   if (trips.isEmpty) {
                     return const Center(
                       child: Text("Aún no tienes actividades"),
@@ -99,8 +115,9 @@ class _HomePageState extends State<HomePage> {
                     itemCount: trips.length,
                     itemBuilder: (context, index) {
                       final trip = trips[index];
+
                       return Card(
-                        color: cs.surfaceContainer, 
+                        color: cs.surfaceContainer,
                         elevation: 0,
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         shape: RoundedRectangleBorder(
