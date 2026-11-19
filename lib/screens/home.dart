@@ -47,8 +47,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    controller.dispose();
-
     if (title == null || title.isEmpty) return;
 
     try {
