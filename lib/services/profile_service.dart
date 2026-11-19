@@ -12,6 +12,23 @@ class ProfileService extends ChangeNotifier {
   ProfileService._();
   static final ProfileService instance = ProfileService._();
 
+  // Normalizar número telefónico.
+  String _normalizarCelular(String celular) {
+    String numero = celular.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Quitar el código de país +52.
+    if (numero.length == 12 && numero.startsWith('52')) {
+      numero = numero.substring(2);
+    }
+
+    // Compatibilidad con el formato anterior +52 1.
+    if (numero.length == 13 && numero.startsWith('521')) {
+      numero = numero.substring(3);
+    }
+
+    return numero;
+  }
+
   FirebaseFirestore get _db => FirebaseFirestore.instance;
   User? get _user => FirebaseAuth.instance.currentUser;
 
@@ -107,6 +124,7 @@ class ProfileService extends ChangeNotifier {
         .set({
           'nombre': nombre,
           'celular': celular,
+          'celularNormalizado': _normalizarCelular(celular),
           'actualizado': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true))
         .timeout(const Duration(seconds: 10));
