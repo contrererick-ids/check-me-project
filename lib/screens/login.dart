@@ -129,8 +129,20 @@ class _LoginScreenState extends State<LoginScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         children: [
-          const SizedBox(height: 50),
-
+          const SizedBox(height: 30),
+        
+          // Logo
+          Center(
+            child: Image.asset(
+              'assets/Logo_CheckMe!.png',
+              width: 220,
+              height: 140,
+              fit: BoxFit.contain,
+            ),
+          ),
+        
+          const SizedBox(height: 20),
+        
           // Titulo
           const Text(
             'Bienvenido',
@@ -141,9 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Colors.black,
             ),
           ),
-
-          const SizedBox(height: 55),
-
+        
+          const SizedBox(height: 40), // antes 55, lo reduje para compensar el logo
           // Campo de correo
           TextField(
             controller: _emailController,
