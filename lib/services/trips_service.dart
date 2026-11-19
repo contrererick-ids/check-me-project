@@ -1,9 +1,9 @@
-
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:proyecto_entrega1/models/expense.dart';
+import 'package:proyecto_entrega1/models/settlement.dart';
 import 'package:proyecto_entrega1/models/trip.dart';
 import 'package:proyecto_entrega1/models/group.dart';
 import 'package:proyecto_entrega1/models/group_member.dart';
@@ -27,9 +27,7 @@ class TripsService {
   }
 
   // Ejecuta operaciones de escritura en Firestore.
-  static Future<bool> _write(
-    Future<dynamic> Function() operation,
-  ) async {
+  static Future<bool> _write(Future<dynamic> Function() operation) async {
     try {
       await operation().timeout(const Duration(seconds: 10));
       return true;
@@ -51,14 +49,12 @@ class TripsService {
         .where('memberIds', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
-      final trips = snapshot.docs.map(Trip.fromDoc).toList();
+          final trips = snapshot.docs.map(Trip.fromDoc).toList();
 
-      trips.sort(
-        (a, b) => b.startDate.compareTo(a.startDate),
-      );
+          trips.sort((a, b) => b.startDate.compareTo(a.startDate));
 
-      return trips;
-    });
+          return trips;
+        });
   }
 
   // Obtener los gastos de una actividad.
@@ -70,8 +66,22 @@ class TripsService {
         .orderBy('date', descending: true)
         .snapshots()
         .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Expense.fromDoc(tripId, doc)).toList(),
+        );
+  }
+
+  // pagos registrados de una actividad, mas recientes primero
+  static Stream<List<Settlement>> settlementsStream(String tripId) {
+    return _db
+        .collection('trips')
+        .doc(tripId)
+        .collection('settlements')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map(
           (snapshot) => snapshot.docs
-              .map((doc) => Expense.fromDoc(tripId, doc))
+              .map((doc) => Settlement.fromDoc(tripId, doc))
               .toList(),
         );
   }
@@ -85,9 +95,7 @@ class TripsService {
     }
 
     if (title.trim().isEmpty) {
-      throw ArgumentError(
-        'El nombre de la actividad es obligatorio',
-      );
+      throw ArgumentError('El nombre de la actividad es obligatorio');
     }
 
     return _write(() async {
@@ -97,9 +105,7 @@ class TripsService {
         'title': title.trim(),
         'ownerId': user.uid,
         'memberIds': [user.uid],
-        'members': {
-          user.uid: currentName,
-        },
+        'members': {user.uid: currentName},
         'startDate': now,
         'endDate': now,
         'currency': 'MXN',
@@ -148,10 +154,7 @@ class TripsService {
       }
 
       // El creador siempre forma parte de la actividad.
-      membersMap.putIfAbsent(
-        user.uid,
-        () => currentName,
-      );
+      membersMap.putIfAbsent(user.uid, () => currentName);
 
       final batch = _db.batch();
 
@@ -165,8 +168,7 @@ class TripsService {
 
       // Si se cambió de grupo, quitar la actividad del anterior.
       if (trip.groupId != null && trip.groupId != group.id) {
-        final oldGroupRef =
-            _db.collection('groups').doc(trip.groupId);
+        final oldGroupRef = _db.collection('groups').doc(trip.groupId);
 
         final oldGroupSnapshot = await oldGroupRef.get();
 
@@ -200,11 +202,7 @@ class TripsService {
     }
 
     return _write(
-      () => _db
-          .collection('trips')
-          .doc(trip.id)
-          .collection('expenses')
-          .add({
+      () => _db.collection('trips').doc(trip.id).collection('expenses').add({
         'title': title,
         'paidById': paidById,
         'paidBy': trip.memberNames[paidById] ?? 'Miembro',
@@ -212,6 +210,65 @@ class TripsService {
         'date': Timestamp.now(),
         'createdBy': user.uid,
       }),
+    );
+  }
+
+  // registrar que [fromId] le pago [amount] a [toId].
+  static Future<bool> addSettlement({
+    required Trip trip,
+    required String fromId,
+    required String fromName,
+    required String toId,
+    required String toName,
+    required double amount,
+  }) {
+    final user = _user;
+
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
+
+    if (fromId == toId) {
+      throw ArgumentError('No se puede registrar un pago a uno mismo');
+    }
+
+    final cents = (amount * 100).round() / 100;
+
+    if (cents <= 0) {
+      throw ArgumentError('El monto debe ser mayor a 0');
+    }
+
+    return _write(
+      () => _db.collection('trips').doc(trip.id).collection('settlements').add({
+        'fromId': fromId,
+        'fromName': fromName,
+        'toId': toId,
+        'toName': toName,
+        'amount': cents,
+        'date': Timestamp.now(),
+        'createdBy': user.uid,
+      }),
+    );
+  }
+
+  // eliminar un pago registrado.
+  static Future<bool> deleteSettlement({
+    required String tripId,
+    required String settlementId,
+  }) {
+    final user = _user;
+
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
+
+    return _write(
+      () => _db
+          .collection('trips')
+          .doc(tripId)
+          .collection('settlements')
+          .doc(settlementId)
+          .delete(),
     );
   }
 }

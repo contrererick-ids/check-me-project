@@ -6,20 +6,10 @@ import 'package:proyecto_entrega1/services/trips_service.dart';
 import 'package:proyecto_entrega1/utils/firestore_errors.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_entrega1/providers/trips_provider.dart';
+import 'package:proyecto_entrega1/screens/settle.dart';
 
 class ExpensesPage extends StatelessWidget {
   const ExpensesPage({super.key});
-
-  void _showSettlementMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'La funcionalidad para saldar cuentas se agregará próximamente.',
-        ),
-        duration: Duration(seconds: 3),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +46,12 @@ class ExpensesPage extends StatelessWidget {
               // la key evita que se mezclen los streams si cambia el orden
               key: ValueKey(trips[index].id),
               trip: trips[index],
-              onSettle: () => _showSettlementMessage(context),
+              onSettle: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettleUpScreen(trip: trips[index]),
+                ),
+              ),
             ),
           );
         },
@@ -107,7 +102,8 @@ class _TripExpensesSectionState extends State<_TripExpensesSection> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.6),
                       ),
                     ),
                   ),
