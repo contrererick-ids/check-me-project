@@ -14,6 +14,30 @@ class GroupsScreen extends StatefulWidget {
 
 class _GroupsScreenState extends State<GroupsScreen> {
 
+  // Consultar nuevamente los grupos directamente desde el servidor.
+  Future<void> _refreshGroups() async {
+    try {
+      await GroupService.refreshGroups();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Grupos actualizados'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudieron actualizar los grupos: $e'),
+        ),
+      );
+    }
+  }
+
   // Mostrar el diálogo para crear un grupo.
   Future<void> _showGroupDialog() async {
     try {
@@ -175,45 +199,76 @@ class _GroupsScreenState extends State<GroupsScreen> {
         child: Column(
           children: [
             Expanded(
-              child: StreamBuilder<List<Group>>(
-                stream: GroupService.groupsStream(),
-                builder: (context, snapshot) {
+              child: RefreshIndicator(
+                onRefresh: _refreshGroups,
+                child: StreamBuilder<List<Group>>(
+                  stream: GroupService.groupsStream(),
+                  builder: (context, snapshot) {
 
-                  // Mientras carga Firebase.
-                  if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    // Mientras carga Firebase.
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(
+                            height: 300,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    // Si ocurre un error.
+                    if (snapshot.hasError) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: 300,
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Text(
+                                  'Error al cargar los grupos:\n${snapshot.error}',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    final groups = snapshot.data ?? [];
+
+                    // Si no existen grupos.
+                    if (groups.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(
+                            height: 300,
+                            child: Center(
+                              child: Text('Aún no tienes grupos'),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    // Mostrar grupos de Firebase.
+                    return ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: groups.length,
+                      itemBuilder: (context, index) {
+                        return _groupCard(groups[index]);
+                      },
                     );
-                  }
-
-                  // Si ocurre un error.
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        'Error al cargar los grupos:\n${snapshot.error}',
-                        textAlign: TextAlign.center,
-                      ),
-                    );
-                  }
-
-                  final groups = snapshot.data ?? [];
-
-                  // Si no existen grupos.
-                  if (groups.isEmpty) {
-                    return const Center(
-                      child: Text('Aún no tienes grupos'),
-                    );
-                  }
-
-                  // Mostrar grupos de Firebase.
-                  return ListView.builder(
-                    itemCount: groups.length,
-                    itemBuilder: (context, index) {
-                      return _groupCard(groups[index]);
-                    },
-                  );
-                },
+                  },
+                ),
               ),
             ),
 
