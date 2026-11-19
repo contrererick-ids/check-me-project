@@ -40,6 +40,23 @@ class GroupService {
     });
   }
 
+  // Forzar una consulta de los grupos directamente a Firebase.
+  static Future<void> refreshGroups() async {
+    final user = _user;
+
+    if (user == null) {
+      throw StateError('No hay sesión iniciada');
+    }
+
+    await _db
+        .collection('groups')
+        .where('memberIds', arrayContains: user.uid)
+        .get(
+          const GetOptions(source: Source.server),
+        );
+  }
+
+
   // Crear un grupo agregando automáticamente al creador.
   static Future<String> createGroup(String name) async {
     final user = _user;
