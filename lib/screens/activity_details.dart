@@ -87,12 +87,11 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                 Padding(
                   padding: const EdgeInsets.all(15),
                   child: Container(
-                    color: cs.surfaceContainer,
                     padding: const EdgeInsets.all(20),
                     height: 210,
                     width: 450,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cs.surfaceContainer,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: cs.outlineVariant),
                     ),
