@@ -7,6 +7,7 @@ import 'package:proyecto_entrega1/screens/login.dart';
 import 'package:proyecto_entrega1/services/profile_service.dart';
 import 'package:proyecto_entrega1/utils/snackbar_utils.dart';
 import 'package:proyecto_entrega1/widgets/user_avatar.dart';
+import 'package:proyecto_entrega1/services/token_service.dart';
 
 enum _OpcionFoto { camara, galeria, eliminar }
 
@@ -155,17 +156,13 @@ class _PerfilScreenState extends State<PerfilScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Cancelar',
-            ),
+            child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
               'Cerrar sesion',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -175,6 +172,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (confirm != true) return;
 
     try {
+      await PushTokenService.instance
+          .deleteToken(); // hay que borrar el token mientras todavia hay sesion
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       _perfil.limpiar();
@@ -188,7 +187,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
       );
     } catch (_) {
       if (!context.mounted) return;
-      showSnackbarMessage(context, 'No se pudo cerrar sesion. Intenta de nuevo.');
+      showSnackbarMessage(
+        context,
+        'No se pudo cerrar sesion. Intenta de nuevo.',
+      );
     }
   }
 
@@ -219,10 +221,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
         ),
         title: const Text(
           'Editar Mi Perfil',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -238,7 +237,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               children: [
                 ListenableBuilder(
                   listenable: _perfil,
-                    builder: (context, _) => UserAvatar(
+                  builder: (context, _) => UserAvatar(
                     radius: 87.5,
                     image: _perfil.foto,
                     loading: _cambiandoFoto,
@@ -249,7 +248,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   bottom: 8,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: cs.surface, 
+                      color: cs.surface,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -269,10 +268,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           const SizedBox(height: 15),
 
           // Nombre
-          const Text(
-            'Nombre',
-            style: TextStyle(fontSize: 15),
-          ),
+          const Text('Nombre', style: TextStyle(fontSize: 15)),
           const SizedBox(height: 6),
           TextField(
             controller: _nombreController,
@@ -284,10 +280,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           const SizedBox(height: 15),
 
           // Celular
-          const Text(
-            'Celular',
-            style: TextStyle(fontSize: 15),
-          ),
+          const Text('Celular', style: TextStyle(fontSize: 15)),
           const SizedBox(height: 6),
           TextField(
             controller: _celularController,
