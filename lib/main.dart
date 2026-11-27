@@ -10,12 +10,13 @@ import 'package:provider/provider.dart';
 import 'package:proyecto_entrega1/providers/trips_provider.dart';
 import 'package:proyecto_entrega1/providers/theme_provider.dart';
 import 'package:proyecto_entrega1/theme/app_theme.dart';
+import 'package:proyecto_entrega1/services/token_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GoogleSignIn.instance.initialize();
-  await initializeDateFormatting('es', null);
+  PushTokenService.instance.init();
   await initializeDateFormatting('es', null);
   final themeProvider = ThemeProvider();
   await themeProvider.load();
@@ -26,7 +27,8 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.themeProvider});
 
   final ThemeProvider themeProvider;
-  static final Stream<User?> _authStream = FirebaseAuth.instance.authStateChanges();
+  static final Stream<User?> _authStream = FirebaseAuth.instance
+      .authStateChanges();
 
   @override
   Widget build(BuildContext context) {
